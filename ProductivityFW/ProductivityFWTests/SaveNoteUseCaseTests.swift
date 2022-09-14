@@ -14,19 +14,7 @@ class SaveNoteUseCaseTests: XCTestCase {
         let invalidContent = ""
         let invalidNote = uniqueNote(content: invalidContent)
 
-        let exp = expectation(description: "Wait for save note completion")
-
-        sut.save(note: invalidNote) { result in
-            switch result {
-            case .success(let note):
-                XCTFail("Expected error, got success with \(note) instead.")
-            case .failure(let error):
-                XCTAssertEqual(error, .invalidContent)
-            }
-            exp.fulfill()
-        }
-
-        wait(for: [exp], timeout: 0.5)
+        expect(sut: sut, with: invalidNote, toCompleteWith: .failure(.invalidContent))
     }
 
     func test_save_doestNotRequestToRetrieveOnInvalidContent() {
@@ -52,36 +40,18 @@ class SaveNoteUseCaseTests: XCTestCase {
         let (sut, store) = makeSUT()
         let note = uniqueNote()
 
-        let exp = expectation(description: "Wait for save note completion")
-        var receivedResult: SaveNoteResult?
-
-        sut.save(note: note) { result in
-            receivedResult = result
-            exp.fulfill()
+        expect(sut: sut, with: note, toCompleteWith: .failure(.insertionError)) {
+            store.completeInsertion(with: .failure(anyNSError()))
         }
-
-        store.completeInsertion(with: .failure(anyNSError()))
-        wait(for: [exp], timeout: 0.5)
-
-        XCTAssertEqual(receivedResult, .failure(.insertionError))
     }
 
     func test_save_deliversSuccessOnInsertionSuccess() {
         let (sut, store) = makeSUT()
         let note = uniqueNote()
 
-        let exp = expectation(description: "Wait for save note completion")
-        var receivedResult: SaveNoteResult?
-
-        sut.save(note: note) { result in
-            receivedResult = result
-            exp.fulfill()
+        expect(sut: sut, with: note, toCompleteWith: .success(note)) {
+            store.completeInsertion(with: .success(note))
         }
-
-        store.completeInsertion(with: .success(note))
-        wait(for: [exp], timeout: 0.5)
-
-        XCTAssertEqual(receivedResult, .success(note))
     }
 
     private func makeSUT() -> (sut: SaveNoteUseCase, store: NotesStoreSpy) {
@@ -96,6 +66,21 @@ class SaveNoteUseCaseTests: XCTestCase {
 
     private func anyNSError() -> NSError {
         return NSError(domain: "any error", code: 0)
+    }
+
+    private func expect(sut: SaveNoteUseCase, with note: Note, toCompleteWith expectedResult: SaveNoteResult, when action: () -> Void = {}) {
+        let exp = expectation(description: "Wait for save note completion")
+        var receivedResult: SaveNoteResult?
+
+        sut.save(note: note) { result in
+            receivedResult = result
+            exp.fulfill()
+        }
+
+        action()
+        wait(for: [exp], timeout: 0.5)
+
+        XCTAssertEqual(receivedResult, expectedResult)
     }
 }
 
