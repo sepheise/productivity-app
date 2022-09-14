@@ -6,3 +6,13 @@
 //
 
 import Foundation
+
+public struct Note {
+    let id: UUID
+    let content: String
+
+    public init(id: UUID, content: String) {
+        self.id = id
+        self.content = content
+    }
+}
