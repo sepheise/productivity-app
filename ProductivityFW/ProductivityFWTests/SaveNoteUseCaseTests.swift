@@ -28,4 +28,21 @@ class SaveNoteUseCaseTests: XCTestCase {
 
         wait(for: [exp], timeout: 0.5)
     }
+
+    func test_save_doestNotRequestToRetrieveOnInvalidContent() {
+        let store = NotesStoreSpy()
+        let sut = SaveNoteUseCase()
+        let invalidContent = ""
+        let invalidNote = Note(id: UUID(), content: invalidContent)
+
+        sut.save(note: invalidNote) { _ in }
+
+        XCTAssertEqual(store.retrievalsCount, 0)
+    }
+}
+
+protocol NotesStore {}
+
+class NotesStoreSpy: NotesStore {
+    var retrievalsCount = 0
 }
