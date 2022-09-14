@@ -9,12 +9,8 @@ import XCTest
 import ProductivityFW
 
 class CoreDataNotesStoreTests: XCTestCase {
-    func test_init_deliversNoError() {
-        XCTAssertNoThrow(try makeSUT())
-    }
-
     func test_insert_deliversNoErrorOnNewNote() {
-        let sut = try! makeSUT()
+        let sut = makeSUT()
         let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
 
         let insertionError = insert(note: note, on: sut)
@@ -23,14 +19,14 @@ class CoreDataNotesStoreTests: XCTestCase {
     }
 
     func test_retrieve_deliversNoneOnNonExistingNote() {
-        let sut = try! makeSUT()
+        let sut = makeSUT()
         let nonExistingId = UUID()
 
         expect(sut, with: nonExistingId, toRetrieve: .success(.none))
     }
 
     func test_retrieve_deliversNoteOnExistingNote() {
-        let sut = try! makeSUT()
+        let sut = makeSUT()
         let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
 
         let _ = insert(note: note, on: sut)
@@ -39,7 +35,7 @@ class CoreDataNotesStoreTests: XCTestCase {
     }
 
     func test_retrieve_hasNoSideEffectsOnExistingNote() {
-        let sut = try! makeSUT()
+        let sut = makeSUT()
         let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
 
         let _ = insert(note: note, on: sut)
@@ -48,7 +44,7 @@ class CoreDataNotesStoreTests: XCTestCase {
     }
 
     func test_insert_updatesExistingNote() {
-        let sut = try! makeSUT()
+        let sut = makeSUT()
         let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
 
         let _ = insert(note: note, on: sut)
@@ -63,9 +59,9 @@ class CoreDataNotesStoreTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeSUT() throws -> CoreDataNotesStore {
+    private func makeSUT() -> CoreDataNotesStore {
         let testStoreURL = URL(fileURLWithPath: "/dev/null")
-        let sut = try CoreDataNotesStore(storeURL: testStoreURL)
+        let sut = try! CoreDataNotesStore(storeURL: testStoreURL)
         return sut
     }
 
