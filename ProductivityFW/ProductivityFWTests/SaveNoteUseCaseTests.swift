@@ -48,18 +48,46 @@ class SaveNoteUseCaseTests: XCTestCase {
         XCTAssertEqual(store.insertionsCount, 1)
     }
 
+    func test_save_deliversInsertionErrorOnInsertionFailure() {
+        let (sut, store) = makeSUT()
+        let note = Note(id: UUID(), content: "A note")
+
+        let exp = expectation(description: "Wait for save note completion")
+        var receivedResult: SaveNoteResult?
+
+        sut.save(note: note) { result in
+            receivedResult = result
+            exp.fulfill()
+        }
+
+        store.completeInsertion(with: .failure(anyNSError()))
+        wait(for: [exp], timeout: 0.5)
+
+        XCTAssertEqual(receivedResult, .failure(.insertionError))
+    }
+
     private func makeSUT() -> (sut: SaveNoteUseCase, store: NotesStoreSpy) {
         let store = NotesStoreSpy()
         let sut = SaveNoteUseCase(store: store)
         return (sut, store)
+    }
+
+    private func anyNSError() -> NSError {
+        return NSError(domain: "any error", code: 0)
     }
 }
 
 class NotesStoreSpy: NotesStore {
     var retrievalsCount = 0
     var insertionsCount = 0
+    private var insertionCompletion: (InsertionResult) -> Void = { _ in }
 
-    func insert(note: Note) {
+    func insert(note: Note, completion: @escaping (InsertionResult) -> Void) {
         insertionsCount += 1
+        insertionCompletion = completion
+    }
+
+    func completeInsertion(with result: InsertionResult) {
+        insertionCompletion(result)
     }
 }

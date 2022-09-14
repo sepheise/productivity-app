@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Note {
+public struct Note: Equatable {
     let id: UUID
     let content: String
 

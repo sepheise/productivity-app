@@ -11,6 +11,7 @@ public typealias SaveNoteResult = Result<Note, SaveNoteError>
 
 public enum SaveNoteError: Error {
     case invalidContent
+    case insertionError
 }
 
 public class SaveNoteUseCase {
@@ -26,8 +27,8 @@ public class SaveNoteUseCase {
             return
         }
 
-        store.insert(note: note)
-
-        completion(.failure(.invalidContent))
+        store.insert(note: note) { result in
+            completion(.failure(.insertionError))
+        }
     }
 }
