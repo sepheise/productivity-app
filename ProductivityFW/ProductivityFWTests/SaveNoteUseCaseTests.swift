@@ -10,7 +10,7 @@ import ProductivityFW
 
 class SaveNoteUseCaseTests: XCTestCase {
     func test_save_deliversInvalidContentErrorOnInvalidContent() {
-        let sut = SaveNoteUseCase()
+        let sut = SaveNoteUseCase(store: NotesStoreSpy())
         let invalidContent = ""
         let invalidNote = Note(id: UUID(), content: invalidContent)
 
@@ -31,7 +31,7 @@ class SaveNoteUseCaseTests: XCTestCase {
 
     func test_save_doestNotRequestToRetrieveOnInvalidContent() {
         let store = NotesStoreSpy()
-        let sut = SaveNoteUseCase()
+        let sut = SaveNoteUseCase(store: store)
         let invalidContent = ""
         let invalidNote = Note(id: UUID(), content: invalidContent)
 
@@ -39,10 +39,23 @@ class SaveNoteUseCaseTests: XCTestCase {
 
         XCTAssertEqual(store.retrievalsCount, 0)
     }
-}
 
-protocol NotesStore {}
+    func test_save_requestsToInsertOnValidContent() {
+        let store = NotesStoreSpy()
+        let sut = SaveNoteUseCase(store: store)
+        let note = Note(id: UUID(), content: "A note")
+
+        sut.save(note: note) { _ in }
+
+        XCTAssertEqual(store.insertionsCount, 1)
+    }
+}
 
 class NotesStoreSpy: NotesStore {
     var retrievalsCount = 0
+    var insertionsCount = 0
+
+    func insert(note: Note) {
+        insertionsCount += 1
+    }
 }

@@ -14,9 +14,20 @@ public enum SaveNoteError: Error {
 }
 
 public class SaveNoteUseCase {
-    public init() {}
+    private let store: NotesStore
+
+    public init(store: NotesStore) {
+        self.store = store
+    }
 
     public func save(note: Note, completion: @escaping (SaveNoteResult) -> Void) {
+        guard !note.content.isEmpty else {
+            completion(.failure(.invalidContent))
+            return
+        }
+
+        store.insert(note: note)
+
         completion(.failure(.invalidContent))
     }
 }
