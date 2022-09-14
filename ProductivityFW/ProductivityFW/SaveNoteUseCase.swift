@@ -28,7 +28,12 @@ public class SaveNoteUseCase {
         }
 
         store.insert(note: note) { result in
-            completion(.failure(.insertionError))
+            switch result {
+            case .success(let note):
+                completion(.success(note))
+            case .failure(_):
+                completion(.failure(.insertionError))
+            }
         }
     }
 }
