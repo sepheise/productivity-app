@@ -9,7 +9,7 @@ import XCTest
 import ProductivityFW
 
 class SaveNoteUseCaseTests: XCTestCase {
-    func test_save_deliversErrorOnInvalidNote() {
+    func test_save_deliversInvalidContentErrorOnInvalidContent() {
         let sut = SaveNoteUseCase()
         let invalidContent = ""
         let invalidNote = Note(id: UUID(), content: invalidContent)
@@ -21,7 +21,7 @@ class SaveNoteUseCaseTests: XCTestCase {
             case .success(let note):
                 XCTFail("Expected error, got success with \(note) instead.")
             case .failure(let error):
-                XCTAssertNotNil(error)
+                XCTAssertEqual(error, .invalidContent)
             }
             exp.fulfill()
         }

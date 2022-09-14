@@ -7,12 +7,16 @@
 
 import Foundation
 
-public typealias SaveNoteResult = Result<Note, Error>
+public typealias SaveNoteResult = Result<Note, SaveNoteError>
+
+public enum SaveNoteError: Error {
+    case invalidContent
+}
 
 public class SaveNoteUseCase {
     public init() {}
 
     public func save(note: Note, completion: @escaping (SaveNoteResult) -> Void) {
-        completion(.failure(NSError(domain: "any error", code: 0)))
+        completion(.failure(.invalidContent))
     }
 }
