@@ -61,7 +61,17 @@ class SaveNoteUseCaseTests: XCTestCase {
     private func makeSUT(currentDate: @escaping () -> Date = Date.init) -> (sut: SaveNoteUseCase, store: NotesStoreSpy) {
         let store = NotesStoreSpy()
         let sut = SaveNoteUseCase(store: store, currentDate: currentDate)
+
+        trackForMemoryLeaks(sut)
+        trackForMemoryLeaks(store)
+
         return (sut, store)
+    }
+
+    func trackForMemoryLeaks(_ instance: AnyObject) {
+        addTeardownBlock { [weak instance] in
+            XCTAssertNil(instance, "Instance of \(String(describing: instance)) should have been deallocated. Potential Memory leak.")
+        }
     }
 
     private func uniqueNote(content: String = "A note") -> Note {
