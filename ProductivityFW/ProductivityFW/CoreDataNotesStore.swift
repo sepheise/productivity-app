@@ -40,21 +40,30 @@ extension CoreDataNotesStore: NotesStore {
         let context = self.context
         context.perform {
             completion(Result {
-                let managedNote = ManagedNote(context: context)
-                managedNote.id = note.id
-                managedNote.content = note.content
-                managedNote.lastSavedAt = note.lastSavedAt! // TODO: replace with local note model
+                let existingNote = try ManagedNote.find(id: note.id, in: context)
+
+                if let existingNote = existingNote {
+                    existingNote.content = note.content
+                    existingNote.lastSavedAt = note.lastSavedAt! // TODO: replace with local note model
+                } else {
+                    let newNote = ManagedNote(context: context)
+                    newNote.id = note.id
+                    newNote.content = note.content
+                    newNote.lastSavedAt = note.lastSavedAt!
+                }
 
                 try context.save()
-                return note
+
+                return Note(id: note.id, content: note.content, lastSavedAt: note.lastSavedAt)
             })
         }
     }
 
     public func retrieve(id: UUID, completion: @escaping (Result<Note?, Error>) -> Void) {
+        let context = self.context
         context.perform {
             completion(Result {
-                let retrievedNote = try ManagedNote.find(id: id, in: self.context)
+                let retrievedNote = try ManagedNote.find(id: id, in: context)
 
                 guard let retrievedNote = retrievedNote else {
                     return .none

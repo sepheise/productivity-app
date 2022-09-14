@@ -47,6 +47,20 @@ class CoreDataNotesStoreTests: XCTestCase {
         expect(sut, with: note.id, toRetrieveTwice: .success(note))
     }
 
+    func test_insert_updatesExistingNote() {
+        let sut = try! makeSUT()
+        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+
+        let _ = insert(note: note, on: sut)
+
+        let updatedNote = Note(id: note.id, content: "Updated content", lastSavedAt: Date())
+
+        let insertionError = insert(note: updatedNote, on: sut)
+        XCTAssertNil(insertionError)
+
+        expect(sut, with: note.id, toRetrieve: .success(updatedNote))
+    }
+
     // MARK: - Helpers
 
     private func makeSUT() throws -> CoreDataNotesStore {
