@@ -14,6 +14,7 @@ public class CoreDataNotesStore {
         .flatMap { NSManagedObjectModel(contentsOf: $0) }
 
     private let container: NSPersistentContainer
+    private let context: NSManagedObjectContext
 
     enum StoreError: Error {
         case modelNotFound
@@ -27,8 +28,26 @@ public class CoreDataNotesStore {
 
         do {
             container = try NSPersistentContainer.load(url: storeURL, name: CoreDataNotesStore.modelName, model: model)
+            context = container.newBackgroundContext()
         } catch {
             throw StoreError.failedToLoadPersistentContainer(error)
+        }
+    }
+}
+
+extension CoreDataNotesStore: NotesStore {
+    public func insert(note: Note, completion: @escaping (InsertionResult) -> Void) {
+        let context = self.context
+        context.perform {
+            completion(Result {
+                let managedNote = ManagedNote(context: context)
+                managedNote.id = note.id
+                managedNote.content = note.content
+                managedNote.lastSavedAt = note.lastSavedAt! // TODO: replace with local note model
+
+                try context.save()
+                return note
+            })
         }
     }
 }

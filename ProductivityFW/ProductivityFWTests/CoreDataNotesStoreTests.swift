@@ -13,6 +13,22 @@ class CoreDataNotesStoreTests: XCTestCase {
         XCTAssertNoThrow(try makeSUT())
     }
 
+    func test_insert_deliversNoErrorOnNewNote() {
+        let sut = try! makeSUT()
+        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+
+        let exp = expectation(description: "Wait for Note insertion")
+        var insertionError: Error?
+
+        sut.insert(note: note) { result in
+            if case let Result.failure(error) = result { insertionError = error }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 0.5)
+        XCTAssertNil(insertionError)
+    }
+
     private func makeSUT() throws -> CoreDataNotesStore {
         let testStoreURL = URL(fileURLWithPath: "/dev/null")
         let sut = try CoreDataNotesStore(storeURL: testStoreURL)
