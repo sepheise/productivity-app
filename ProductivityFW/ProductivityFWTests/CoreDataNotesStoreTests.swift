@@ -26,16 +26,7 @@ class CoreDataNotesStoreTests: XCTestCase {
         let sut = try! makeSUT()
         let nonExistingId = UUID()
 
-        let exp = expectation(description: "Wait for Note retrieval")
-        var retrievedNote: Note?
-
-        sut.retrieve(id: nonExistingId) { result in
-            if case let Result.success(note) = result { retrievedNote = note }
-            exp.fulfill()
-        }
-
-        wait(for: [exp], timeout: 0.5)
-        XCTAssertEqual(retrievedNote, .none)
+        expect(sut, with: nonExistingId, toRetrieve: .success(.none))
     }
 
     func test_retrieve_deliversNoteOnExistingNote() {
@@ -44,17 +35,19 @@ class CoreDataNotesStoreTests: XCTestCase {
 
         let _ = insert(note: note, on: sut)
 
-        let exp2 = expectation(description: "Wait for Note retrieval")
-        var retrievedNote: Note?
-
-        sut.retrieve(id: note.id) { result in
-            if case let Result.success(note) = result { retrievedNote = note }
-            exp2.fulfill()
-        }
-
-        wait(for: [exp2], timeout: 0.5)
-        XCTAssertEqual(retrievedNote, note)
+        expect(sut, with: note.id, toRetrieve: .success(note))
     }
+
+    func test_retrieve_hasNoSideEffectsOnExistingNote() {
+        let sut = try! makeSUT()
+        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+
+        let _ = insert(note: note, on: sut)
+
+        expect(sut, with: note.id, toRetrieveTwice: .success(note))
+    }
+
+    // MARK: - Helpers
 
     private func makeSUT() throws -> CoreDataNotesStore {
         let testStoreURL = URL(fileURLWithPath: "/dev/null")
@@ -73,5 +66,41 @@ class CoreDataNotesStoreTests: XCTestCase {
 
         wait(for: [exp], timeout: 0.5)
         return insertionError
+    }
+
+    private func expect(_ sut: CoreDataNotesStore, with id: UUID, toRetrieve expectedResult: RetrievalResult) {
+
+        let exp = expectation(description: "Wait for Note retrieval")
+
+        sut.retrieve(id: id) { retrievedResult in
+            switch(expectedResult, retrievedResult) {
+            case (.success(.none), .success(.none)),
+                (.failure, .failure):
+                break
+
+            case let (.success(.some(expected)), .success(.some(retrieved))):
+                XCTAssertEqual(retrieved.id, expected.id)
+                XCTAssertEqual(retrieved.content, expected.content)
+                XCTAssertEqual(retrieved.lastSavedAt, expected.lastSavedAt)
+
+            default:
+                XCTFail("Expected to retrieve \(String(describing: expectedResult)), got \(String(describing: retrievedResult)) instead")
+            }
+
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 0.5)
+    }
+
+    private func expect(_ sut: CoreDataNotesStore, with id: UUID, toRetrieveTwice expectedResult: RetrievalResult) {
+        expect(sut, with: id, toRetrieve: expectedResult)
+        expect(sut, with: id, toRetrieve: expectedResult)
+    }
+
+    private typealias RetrievalResult = Result<Note?, RetrievalError>
+
+    private enum RetrievalError: Error {
+        case error
     }
 }
