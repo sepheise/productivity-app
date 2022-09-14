@@ -17,15 +17,8 @@ class CoreDataNotesStoreTests: XCTestCase {
         let sut = try! makeSUT()
         let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
 
-        let exp = expectation(description: "Wait for Note insertion")
-        var insertionError: Error?
+        let insertionError = insert(note: note, on: sut)
 
-        sut.insert(note: note) { result in
-            if case let Result.failure(error) = result { insertionError = error }
-            exp.fulfill()
-        }
-
-        wait(for: [exp], timeout: 0.5)
         XCTAssertNil(insertionError)
     }
 
@@ -45,9 +38,40 @@ class CoreDataNotesStoreTests: XCTestCase {
         XCTAssertEqual(retrievedNote, .none)
     }
 
+    func test_retrieve_deliversNoteOnExistingNote() {
+        let sut = try! makeSUT()
+        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+
+        let _ = insert(note: note, on: sut)
+
+        let exp2 = expectation(description: "Wait for Note retrieval")
+        var retrievedNote: Note?
+
+        sut.retrieve(id: note.id) { result in
+            if case let Result.success(note) = result { retrievedNote = note }
+            exp2.fulfill()
+        }
+
+        wait(for: [exp2], timeout: 0.5)
+        XCTAssertEqual(retrievedNote, note)
+    }
+
     private func makeSUT() throws -> CoreDataNotesStore {
         let testStoreURL = URL(fileURLWithPath: "/dev/null")
         let sut = try CoreDataNotesStore(storeURL: testStoreURL)
         return sut
+    }
+
+    private func insert(note: Note, on sut: CoreDataNotesStore) -> Error? {
+        let exp = expectation(description: "Wait for Note insertion")
+        var insertionError: Error?
+
+        sut.insert(note: note) { result in
+            if case let Result.failure(error) = result { insertionError = error }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 0.5)
+        return insertionError
     }
 }
