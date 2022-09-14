@@ -24,16 +24,20 @@ class SaveNoteUseCaseTests: XCTestCase {
 
         sut.save(note: invalidNote) { _ in }
 
-        XCTAssertEqual(store.insertionsCount, 0)
+        XCTAssertEqual(store.insertions.count, 0)
     }
 
-    func test_save_requestsToInsertOnValidContent() {
-        let (sut, store) = makeSUT()
+    func test_save_requestsToInsertOnValidContentWithLastSavedAtTimestamp() {
+        let timestamp = Date()
+        let (sut, store) = makeSUT(currentDate: { timestamp })
         let note = uniqueNote()
 
         sut.save(note: note) { _ in }
 
-        XCTAssertEqual(store.insertionsCount, 1)
+        XCTAssertEqual(store.insertions.count, 1)
+        XCTAssertEqual(store.insertions.first?.id, note.id)
+        XCTAssertEqual(store.insertions.first?.content, note.content)
+        XCTAssertEqual(store.insertions.first?.lastSavedAt, timestamp)
     }
 
     func test_save_deliversInsertionErrorOnInsertionFailure() {
@@ -54,14 +58,14 @@ class SaveNoteUseCaseTests: XCTestCase {
         }
     }
 
-    private func makeSUT() -> (sut: SaveNoteUseCase, store: NotesStoreSpy) {
+    private func makeSUT(currentDate: @escaping () -> Date = Date.init) -> (sut: SaveNoteUseCase, store: NotesStoreSpy) {
         let store = NotesStoreSpy()
-        let sut = SaveNoteUseCase(store: store)
+        let sut = SaveNoteUseCase(store: store, currentDate: currentDate)
         return (sut, store)
     }
 
     private func uniqueNote(content: String = "A note") -> Note {
-        return Note(id: UUID(), content: content)
+        return Note(id: UUID(), content: content, lastSavedAt: nil)
     }
 
     private func anyNSError() -> NSError {
@@ -85,11 +89,11 @@ class SaveNoteUseCaseTests: XCTestCase {
 }
 
 class NotesStoreSpy: NotesStore {
-    var insertionsCount = 0
+    var insertions = [Note]()
     private var insertionCompletion: (InsertionResult) -> Void = { _ in }
 
     func insert(note: Note, completion: @escaping (InsertionResult) -> Void) {
-        insertionsCount += 1
+        insertions.append(note)
         insertionCompletion = completion
     }
 

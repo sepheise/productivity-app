@@ -16,9 +16,11 @@ public enum SaveNoteError: Error {
 
 public class SaveNoteUseCase {
     private let store: NotesStore
+    private let currentDate: () -> Date
 
-    public init(store: NotesStore) {
+    public init(store: NotesStore, currentDate: @escaping () -> Date) {
         self.store = store
+        self.currentDate = currentDate
     }
 
     public func save(note: Note, completion: @escaping (SaveNoteResult) -> Void) {
@@ -27,7 +29,9 @@ public class SaveNoteUseCase {
             return
         }
 
-        store.insert(note: note) { result in
+        let noteWithLastSavedAt = Note(id: note.id, content: note.content, lastSavedAt: currentDate())
+
+        store.insert(note: noteWithLastSavedAt) { result in
             switch result {
             case .success(let note):
                 completion(.success(note))

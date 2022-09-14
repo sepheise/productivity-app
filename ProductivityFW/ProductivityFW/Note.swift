@@ -8,11 +8,13 @@
 import Foundation
 
 public struct Note: Equatable {
-    let id: UUID
-    let content: String
+    public let id: UUID
+    public let content: String
+    public let lastSavedAt: Date?
 
-    public init(id: UUID, content: String) {
+    public init(id: UUID, content: String, lastSavedAt: Date?) {
         self.id = id
         self.content = content
+        self.lastSavedAt = lastSavedAt
     }
 }
