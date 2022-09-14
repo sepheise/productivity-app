@@ -35,7 +35,7 @@ public class SaveNoteUseCase {
             switch result {
             case .success(let note):
                 completion(.success(note))
-            case .failure(_):
+            case .failure:
                 completion(.failure(.insertionError))
             }
         }
