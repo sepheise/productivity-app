@@ -12,7 +12,7 @@ class SaveNoteUseCaseTests: XCTestCase {
     func test_save_deliversInvalidContentErrorOnInvalidContent() {
         let (sut, _) = makeSUT()
         let invalidContent = ""
-        let invalidNote = Note(id: UUID(), content: invalidContent)
+        let invalidNote = uniqueNote(content: invalidContent)
 
         let exp = expectation(description: "Wait for save note completion")
 
@@ -32,7 +32,7 @@ class SaveNoteUseCaseTests: XCTestCase {
     func test_save_doestNotRequestToRetrieveOnInvalidContent() {
         let (sut, store) = makeSUT()
         let invalidContent = ""
-        let invalidNote = Note(id: UUID(), content: invalidContent)
+        let invalidNote = uniqueNote(content: invalidContent)
 
         sut.save(note: invalidNote) { _ in }
 
@@ -41,7 +41,7 @@ class SaveNoteUseCaseTests: XCTestCase {
 
     func test_save_requestsToInsertOnValidContent() {
         let (sut, store) = makeSUT()
-        let note = Note(id: UUID(), content: "A note")
+        let note = uniqueNote()
 
         sut.save(note: note) { _ in }
 
@@ -50,7 +50,7 @@ class SaveNoteUseCaseTests: XCTestCase {
 
     func test_save_deliversInsertionErrorOnInsertionFailure() {
         let (sut, store) = makeSUT()
-        let note = Note(id: UUID(), content: "A note")
+        let note = uniqueNote()
 
         let exp = expectation(description: "Wait for save note completion")
         var receivedResult: SaveNoteResult?
@@ -68,7 +68,7 @@ class SaveNoteUseCaseTests: XCTestCase {
 
     func test_save_deliversSuccessOnInsertionSuccess() {
         let (sut, store) = makeSUT()
-        let note = Note(id: UUID(), content: "A note")
+        let note = uniqueNote()
 
         let exp = expectation(description: "Wait for save note completion")
         var receivedResult: SaveNoteResult?
@@ -88,6 +88,10 @@ class SaveNoteUseCaseTests: XCTestCase {
         let store = NotesStoreSpy()
         let sut = SaveNoteUseCase(store: store)
         return (sut, store)
+    }
+
+    private func uniqueNote(content: String = "A note") -> Note {
+        return Note(id: UUID(), content: content)
     }
 
     private func anyNSError() -> NSError {
