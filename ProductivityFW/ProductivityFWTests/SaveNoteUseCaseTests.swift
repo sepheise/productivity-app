@@ -17,14 +17,14 @@ class SaveNoteUseCaseTests: XCTestCase {
         expect(sut: sut, with: invalidNote, toCompleteWith: .failure(.invalidContent))
     }
 
-    func test_save_doestNotRequestToRetrieveOnInvalidContent() {
+    func test_save_doestNotRequestToInsertOnInvalidContent() {
         let (sut, store) = makeSUT()
         let invalidContent = ""
         let invalidNote = uniqueNote(content: invalidContent)
 
         sut.save(note: invalidNote) { _ in }
 
-        XCTAssertEqual(store.retrievalsCount, 0)
+        XCTAssertEqual(store.insertionsCount, 0)
     }
 
     func test_save_requestsToInsertOnValidContent() {
@@ -85,7 +85,6 @@ class SaveNoteUseCaseTests: XCTestCase {
 }
 
 class NotesStoreSpy: NotesStore {
-    var retrievalsCount = 0
     var insertionsCount = 0
     private var insertionCompletion: (InsertionResult) -> Void = { _ in }
 
