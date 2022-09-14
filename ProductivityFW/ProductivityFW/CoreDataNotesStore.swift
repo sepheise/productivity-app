@@ -50,6 +50,20 @@ extension CoreDataNotesStore: NotesStore {
             })
         }
     }
+
+    public func retrieve(id: UUID, completion: @escaping (Result<Note?, Error>) -> Void) {
+        context.perform {
+            completion(Result {
+                let retrievedNote = try ManagedNote.find(id: id, in: self.context)
+
+                guard let retrievedNote = retrievedNote else {
+                    return .none
+                }
+
+                return Note(id: retrievedNote.id, content: retrievedNote.content, lastSavedAt: retrievedNote.lastSavedAt)
+            })
+        }
+    }
 }
 
 private extension NSPersistentContainer {

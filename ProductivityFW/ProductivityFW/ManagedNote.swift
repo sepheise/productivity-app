@@ -13,3 +13,13 @@ class ManagedNote: NSManagedObject {
     @NSManaged var content: String
     @NSManaged var lastSavedAt: Date
 }
+
+extension ManagedNote {
+    static func find(id: UUID, in context: NSManagedObjectContext) throws -> ManagedNote? {
+        let request = NSFetchRequest<ManagedNote>(entityName: entity().name!)
+        request.predicate = NSPredicate(format: "%K == %@", argumentArray: [#keyPath(ManagedNote.id), id])
+        request.returnsObjectsAsFaults = false
+        request.fetchLimit = 1
+        return try context.fetch(request).first
+    }
+}
