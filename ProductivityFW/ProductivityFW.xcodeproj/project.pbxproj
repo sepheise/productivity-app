@@ -81,12 +81,8 @@
 		51F4D60628D16772007D92EC /* ProductivityFW */ = {
 			isa = PBXGroup;
 			children = (
-				51F4D61E28D16AC7007D92EC /* SaveNoteUseCase.swift */,
-				51F4D62028D16B19007D92EC /* Note.swift */,
-				51F4D62228D1721A007D92EC /* NotesStore.swift */,
-				51F4D62928D2426E007D92EC /* NotesStore.xcdatamodeld */,
-				51F4D62C28D2454D007D92EC /* CoreDataNotesStore.swift */,
-				51F4D62E28D25BF2007D92EC /* ManagedNote.swift */,
+				51F4D63028D357F8007D92EC /* Domain */,
+				51F4D63328D35AD7007D92EC /* Persistence */,
 			);
 			path = ProductivityFW;
 			sourceTree = "<group>";
@@ -98,6 +94,42 @@
 				51F4D62428D22FCA007D92EC /* CoreDataNotesStoreTests.swift */,
 			);
 			path = ProductivityFWTests;
+			sourceTree = "<group>";
+		};
+		51F4D63028D357F8007D92EC /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				51F4D62028D16B19007D92EC /* Note.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		51F4D63128D3595F007D92EC /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				51F4D63228D35A88007D92EC /* CoreData */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		51F4D63228D35A88007D92EC /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				51F4D62C28D2454D007D92EC /* CoreDataNotesStore.swift */,
+				51F4D62E28D25BF2007D92EC /* ManagedNote.swift */,
+				51F4D62928D2426E007D92EC /* NotesStore.xcdatamodeld */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		51F4D63328D35AD7007D92EC /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				51F4D63128D3595F007D92EC /* Infrastructure */,
+				51F4D62228D1721A007D92EC /* NotesStore.swift */,
+				51F4D61E28D16AC7007D92EC /* SaveNoteUseCase.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
