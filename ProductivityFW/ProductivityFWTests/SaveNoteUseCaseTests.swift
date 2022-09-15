@@ -12,7 +12,7 @@ class SaveNoteUseCaseTests: XCTestCase {
     func test_save_deliversInvalidContentErrorOnInvalidContent() {
         let (sut, _) = makeSUT()
         let invalidContent = ""
-        let invalidNote = uniqueNote(content: invalidContent)
+        let invalidNote = uniqueNote(content: invalidContent).model
 
         expect(sut: sut, with: invalidNote, toCompleteWith: .failure(.invalidContent))
     }
@@ -20,7 +20,7 @@ class SaveNoteUseCaseTests: XCTestCase {
     func test_save_doestNotRequestToInsertOnInvalidContent() {
         let (sut, store) = makeSUT()
         let invalidContent = ""
-        let invalidNote = uniqueNote(content: invalidContent)
+        let invalidNote = uniqueNote(content: invalidContent).model
 
         sut.save(note: invalidNote) { _ in }
 
@@ -30,7 +30,7 @@ class SaveNoteUseCaseTests: XCTestCase {
     func test_save_requestsToInsertOnValidContentWithLastSavedAtTimestamp() {
         let timestamp = Date()
         let (sut, store) = makeSUT(currentDate: { timestamp })
-        let note = uniqueNote()
+        let note = uniqueNote().model
 
         sut.save(note: note) { _ in }
 
@@ -42,7 +42,7 @@ class SaveNoteUseCaseTests: XCTestCase {
 
     func test_save_deliversInsertionErrorOnInsertionFailure() {
         let (sut, store) = makeSUT()
-        let note = uniqueNote()
+        let note = uniqueNote().model
 
         expect(sut: sut, with: note, toCompleteWith: .failure(.insertionError)) {
             store.completeInsertion(with: .failure(anyNSError()))
@@ -53,8 +53,8 @@ class SaveNoteUseCaseTests: XCTestCase {
         let (sut, store) = makeSUT()
         let note = uniqueNote()
 
-        expect(sut: sut, with: note, toCompleteWith: .success(note)) {
-            store.completeInsertion(with: .success(note))
+        expect(sut: sut, with: note.model, toCompleteWith: .success(note.model)) {
+            store.completeInsertion(with: .success(note.local))
         }
     }
 
@@ -74,14 +74,6 @@ class SaveNoteUseCaseTests: XCTestCase {
         }
     }
 
-    private func uniqueNote(content: String = "A note") -> Note {
-        return Note(id: UUID(), content: content, lastSavedAt: nil)
-    }
-
-    private func anyNSError() -> NSError {
-        return NSError(domain: "any error", code: 0)
-    }
-
     private func expect(sut: SaveNoteUseCase, with note: Note, toCompleteWith expectedResult: SaveNoteResult, when action: () -> Void = {}) {
         let exp = expectation(description: "Wait for save note completion")
         var receivedResult: SaveNoteResult?
@@ -99,10 +91,10 @@ class SaveNoteUseCaseTests: XCTestCase {
 }
 
 class NotesStoreSpy: NotesStore {
-    var insertions = [Note]()
+    var insertions = [LocalNote]()
     private var insertionCompletion: (InsertionResult) -> Void = { _ in }
 
-    func insert(note: Note, completion: @escaping (InsertionResult) -> Void) {
+    func insert(note: LocalNote, completion: @escaping (InsertionResult) -> Void) {
         insertions.append(note)
         insertionCompletion = completion
     }

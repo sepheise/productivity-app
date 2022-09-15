@@ -29,15 +29,21 @@ public class SaveNoteUseCase {
             return
         }
 
-        let noteWithLastSavedAt = Note(id: note.id, content: note.content, lastSavedAt: currentDate())
+        let noteWithLastSavedAt = LocalNote(id: note.id, content: note.content, lastSavedAt: currentDate())
 
         store.insert(note: noteWithLastSavedAt) { result in
             switch result {
-            case .success(let note):
-                completion(.success(note))
+            case .success(let insertedNote):
+                completion(.success(insertedNote.toModel()))
             case .failure:
                 completion(.failure(.insertionError))
             }
         }
+    }
+}
+
+private extension LocalNote {
+    func toModel() -> Note {
+        return Note(id: id, content: content, lastSavedAt: lastSavedAt)
     }
 }

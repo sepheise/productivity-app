@@ -36,7 +36,7 @@ public class CoreDataNotesStore {
 }
 
 extension CoreDataNotesStore: NotesStore {
-    public func insert(note: Note, completion: @escaping (InsertionResult) -> Void) {
+    public func insert(note: LocalNote, completion: @escaping (InsertionResult) -> Void) {
         let context = self.context
         context.perform {
             completion(Result {
@@ -44,22 +44,22 @@ extension CoreDataNotesStore: NotesStore {
 
                 if let existingNote = existingNote {
                     existingNote.content = note.content
-                    existingNote.lastSavedAt = note.lastSavedAt! // TODO: replace with local note model
+                    existingNote.lastSavedAt = note.lastSavedAt
                 } else {
                     let newNote = ManagedNote(context: context)
                     newNote.id = note.id
                     newNote.content = note.content
-                    newNote.lastSavedAt = note.lastSavedAt!
+                    newNote.lastSavedAt = note.lastSavedAt
                 }
 
                 try context.save()
 
-                return Note(id: note.id, content: note.content, lastSavedAt: note.lastSavedAt)
+                return LocalNote(id: note.id, content: note.content, lastSavedAt: note.lastSavedAt)
             })
         }
     }
 
-    public func retrieve(id: UUID, completion: @escaping (Result<Note?, Error>) -> Void) {
+    public func retrieve(id: UUID, completion: @escaping (Result<LocalNote?, Error>) -> Void) {
         let context = self.context
         context.perform {
             completion(Result {
@@ -69,7 +69,7 @@ extension CoreDataNotesStore: NotesStore {
                     return .none
                 }
 
-                return Note(id: retrievedNote.id, content: retrievedNote.content, lastSavedAt: retrievedNote.lastSavedAt)
+                return LocalNote(id: retrievedNote.id, content: retrievedNote.content, lastSavedAt: retrievedNote.lastSavedAt)
             })
         }
     }

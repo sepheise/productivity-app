@@ -16,6 +16,8 @@
 		51F4D62B28D2426E007D92EC /* NotesStore.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 51F4D62928D2426E007D92EC /* NotesStore.xcdatamodeld */; };
 		51F4D62D28D2454D007D92EC /* CoreDataNotesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F4D62C28D2454D007D92EC /* CoreDataNotesStore.swift */; };
 		51F4D62F28D25BF2007D92EC /* ManagedNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F4D62E28D25BF2007D92EC /* ManagedNote.swift */; };
+		51F4D63728D3687E007D92EC /* LocalNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F4D63628D3687E007D92EC /* LocalNote.swift */; };
+		51F4D63B28D3AA41007D92EC /* PersistenceTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F4D63A28D3AA41007D92EC /* PersistenceTestHelpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +41,8 @@
 		51F4D62A28D2426E007D92EC /* NotesStore.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NotesStore.xcdatamodel; sourceTree = "<group>"; };
 		51F4D62C28D2454D007D92EC /* CoreDataNotesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNotesStore.swift; sourceTree = "<group>"; };
 		51F4D62E28D25BF2007D92EC /* ManagedNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedNote.swift; sourceTree = "<group>"; };
+		51F4D63628D3687E007D92EC /* LocalNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNote.swift; sourceTree = "<group>"; };
+		51F4D63A28D3AA41007D92EC /* PersistenceTestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTestHelpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +94,7 @@
 		51F4D61028D16772007D92EC /* ProductivityFWTests */ = {
 			isa = PBXGroup;
 			children = (
+				51F4D63828D3A9F2007D92EC /* Helpers */,
 				51F4D61C28D16886007D92EC /* SaveNoteUseCaseTests.swift */,
 				51F4D62428D22FCA007D92EC /* CoreDataNotesStoreTests.swift */,
 			);
@@ -128,8 +133,17 @@
 				51F4D63128D3595F007D92EC /* Infrastructure */,
 				51F4D62228D1721A007D92EC /* NotesStore.swift */,
 				51F4D61E28D16AC7007D92EC /* SaveNoteUseCase.swift */,
+				51F4D63628D3687E007D92EC /* LocalNote.swift */,
 			);
 			path = Persistence;
+			sourceTree = "<group>";
+		};
+		51F4D63828D3A9F2007D92EC /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				51F4D63A28D3AA41007D92EC /* PersistenceTestHelpers.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -247,6 +261,7 @@
 				51F4D62B28D2426E007D92EC /* NotesStore.xcdatamodeld in Sources */,
 				51F4D61F28D16AC7007D92EC /* SaveNoteUseCase.swift in Sources */,
 				51F4D62D28D2454D007D92EC /* CoreDataNotesStore.swift in Sources */,
+				51F4D63728D3687E007D92EC /* LocalNote.swift in Sources */,
 				51F4D62128D16B19007D92EC /* Note.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -255,6 +270,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51F4D63B28D3AA41007D92EC /* PersistenceTestHelpers.swift in Sources */,
 				51F4D61D28D16886007D92EC /* SaveNoteUseCaseTests.swift in Sources */,
 				51F4D62528D22FCA007D92EC /* CoreDataNotesStoreTests.swift in Sources */,
 			);

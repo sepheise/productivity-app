@@ -11,7 +11,7 @@ import ProductivityFW
 class CoreDataNotesStoreTests: XCTestCase {
     func test_insert_deliversNoErrorOnNewNote() {
         let sut = makeSUT()
-        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+        let note = uniqueNote().local
 
         let insertionError = insert(note: note, on: sut)
 
@@ -27,7 +27,7 @@ class CoreDataNotesStoreTests: XCTestCase {
 
     func test_retrieve_deliversNoteOnExistingNote() {
         let sut = makeSUT()
-        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+        let note = uniqueNote().local
 
         let _ = insert(note: note, on: sut)
 
@@ -36,7 +36,7 @@ class CoreDataNotesStoreTests: XCTestCase {
 
     func test_retrieve_hasNoSideEffectsOnExistingNote() {
         let sut = makeSUT()
-        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+        let note = uniqueNote().local
 
         let _ = insert(note: note, on: sut)
 
@@ -45,11 +45,11 @@ class CoreDataNotesStoreTests: XCTestCase {
 
     func test_insert_updatesExistingNote() {
         let sut = makeSUT()
-        let note = Note(id: UUID(), content: "A note", lastSavedAt: Date())
+        let note = uniqueNote().local
 
         let _ = insert(note: note, on: sut)
 
-        let updatedNote = Note(id: note.id, content: "Updated content", lastSavedAt: Date())
+        let updatedNote = LocalNote(id: note.id, content: "Updated content", lastSavedAt: Date())
 
         let insertionError = insert(note: updatedNote, on: sut)
         XCTAssertNil(insertionError)
@@ -65,7 +65,7 @@ class CoreDataNotesStoreTests: XCTestCase {
         return sut
     }
 
-    private func insert(note: Note, on sut: CoreDataNotesStore) -> Error? {
+    private func insert(note: LocalNote, on sut: CoreDataNotesStore) -> Error? {
         let exp = expectation(description: "Wait for Note insertion")
         var insertionError: Error?
 
@@ -108,7 +108,7 @@ class CoreDataNotesStoreTests: XCTestCase {
         expect(sut, with: id, toRetrieve: expectedResult)
     }
 
-    private typealias RetrievalResult = Result<Note?, RetrievalError>
+    private typealias RetrievalResult = Result<LocalNote?, RetrievalError>
 
     private enum RetrievalError: Error {
         case error
