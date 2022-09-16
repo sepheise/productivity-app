@@ -1,0 +1,55 @@
+name: main-ci
+on: 
+  push:
+    branches:
+      - 'main'
+jobs:
+  test:
+    runs-on: macos-12
+    outputs:
+      output1: ${{ steps.build-status.outputs.status }}
+      output2: ${{ steps.tests-status.outputs.status }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Build for testing
+        run: |
+          xcodebuild build-for-testing \
+            -project ProductivityFW/ProductivityFW.xcodeproj \
+            -scheme CI CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+      - name: Save build status
+        id: build-status
+        run: echo "::set-output name=status::${{ job.status }}"
+      - name: Run CI scheme Tests
+        run: |
+          xcodebuild test \
+            -project ProductivityFW/ProductivityFW.xcodeproj \
+            -scheme CI CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+            -resultBundlePath build/ResultBundle.xcresult
+      - name: Save tests status
+        id: tests-status
+        run: echo "::set-output name=status::${{ job.status }}"
+  update-badges:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Creates build status badge
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: e6b6d639ed2a33d1d08b84237724ebe9
+          filename: productivity-app-build-status.json
+          label: Build
+          message: ${{ needs.test.outputs.output1 == 'success' && 'passing' || 'failing' }}
+          color: green
+          isError: ${{ needs.test.outputs.output1 != 'success' }}
+      - name: Creates test status badge
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: f766cc76b47b16757b8d724d198ddd52
+          filename: productivity-app-test-status.json
+          label: Tests
+          message: ${{ needs.test.outputs.output2 == 'success' && 'passing' || 'failing' }}
+          color: green
+          isError: ${{ needs.test.outputs.output2 != 'success' }}
