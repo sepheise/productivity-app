@@ -6,6 +6,9 @@ on:
 jobs:
   test:
     runs-on: macos-12
+    outputs:
+      output1: ${{ steps.build-for-testing.outputs.status }}
+      output2: ${{ steps.run-tests.outputs.status }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -16,6 +19,9 @@ jobs:
             -scheme CI CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
       - name: Save build status
         run: echo "BUILD_STATUS=${{ job.status }}" >> $GITHUB_ENV
+      - name: Build for testing status
+        id: build-for-testing
+        run: echo "::set-output name=status::${{ job.status }}"
       - name: Creates build status badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
@@ -32,6 +38,9 @@ jobs:
             -project ProductivityFW/ProductivityFW.xcodeproj \
             -scheme CI CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -resultBundlePath build/ResultBundle.xcresult
+      - name: Run Tests status
+        id: run-tests
+        run: echo "::set-output name=status::${{ job.status }}"
       - name: Save test status
         run: echo "TEST_STATUS=${{ job.status }}" >> $GITHUB_ENV
       - name: Creates test status badge
@@ -48,5 +57,5 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - run: echo "Build status is ${{ env.BUILD_STATUS }}"
-      - run: echo "Test status is ${{ env.TEST_STATUS }}"
+      - run: echo "Build status is ${{ needs.test.outputs.output1 }}"
+      - run: echo "Test status is ${{ needs.test.outputs.output2 }}"
