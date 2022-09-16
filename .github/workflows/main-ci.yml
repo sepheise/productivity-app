@@ -2,7 +2,8 @@ name: main-ci
 on: 
   push:
     branches:
-      - 'main'
+      # Changed temporary for branch work. Restore to main when finish.
+      - 'gather-and-show-coverage'
 jobs:
   test:
     runs-on: macos-12
@@ -29,10 +30,21 @@ jobs:
       - name: Save tests status
         id: tests-status
         run: echo "::set-output name=status::${{ job.status }}"
+      - name: Archive tests results
+        uses: actions/upload-artifact@v3
+        with:
+          name: tests-results
+          path: build/ResultBundle.xcresult
+          retention-days: 1
   update-badges:
     runs-on: ubuntu-latest
     needs: test
     steps:
+      - name: Download tests results
+        uses: actions/download-artifact@v3
+        with:
+          name: tests-results
+      - run: ls
       - name: Creates build status badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
