@@ -5,13 +5,15 @@ on:
       - 'setup-ci'
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: List files in the repository
+      - name: Run tests in CI scheme
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}." 
+          xcodebuild clean build test \
+            -project ProductivityFW/ProductivityFW.xcodeproj \
+            -scheme "CI" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+            -enableCodeCoverage YES
+      - run: echo "🍏 This job's status is ${{ job.status }}."
 
