@@ -8,8 +8,8 @@ jobs:
   test:
     runs-on: macos-12
     outputs:
-      output1: ${{ steps.build-status.outputs.status }}
-      output2: ${{ steps.tests-status.outputs.status }}
+      buildStatus: ${{ steps.build-status.outputs.status }}
+      testStatus: ${{ steps.tests-status.outputs.status }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -61,9 +61,9 @@ jobs:
           gistID: e6b6d639ed2a33d1d08b84237724ebe9
           filename: productivity-app-build-status.json
           label: Build
-          message: ${{ needs.test.outputs.output1 == 'success' && 'passing' || 'failing' }}
+          message: ${{ needs.test.outputs.buildStatus == 'success' && 'passing' || 'failing' }}
           color: green
-          isError: ${{ needs.test.outputs.output1 != 'success' }}
+          isError: ${{ needs.test.outputs.buildStatus != 'success' }}
       - name: Create test status badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
@@ -71,9 +71,9 @@ jobs:
           gistID: f766cc76b47b16757b8d724d198ddd52
           filename: productivity-app-test-status.json
           label: Tests
-          message: ${{ needs.test.outputs.output2 == 'success' && 'passing' || 'failing' }}
+          message: ${{ needs.test.outputs.testStatus == 'success' && 'passing' || 'failing' }}
           color: green
-          isError: ${{ needs.test.outputs.output2 != 'success' }}
+          isError: ${{ needs.test.outputs.testStatus != 'success' }}
       - name: Create coverage badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
