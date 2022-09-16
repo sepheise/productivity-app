@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, parse-coverage-results]
     steps:
-      - name: Creates build status badge
+      - name: Create build status badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
@@ -64,7 +64,7 @@ jobs:
           message: ${{ needs.test.outputs.output1 == 'success' && 'passing' || 'failing' }}
           color: green
           isError: ${{ needs.test.outputs.output1 != 'success' }}
-      - name: Creates test status badge
+      - name: Create test status badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
@@ -74,5 +74,14 @@ jobs:
           message: ${{ needs.test.outputs.output2 == 'success' && 'passing' || 'failing' }}
           color: green
           isError: ${{ needs.test.outputs.output2 != 'success' }}
-      - name: Creates coverage badge
-        run: echo ${{ needs.parse-coverage-results.outputs.coverage }}
+      - name: Create coverage badge
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 5bea4737aa2970ee369b3116b8f2861d
+          filename: productivity-app-coverage.json
+          label: Tests
+          message: ${{ needs.parse-coverage-results.outputs.coverage }}
+          valColorRange: ${{ needs.parse-coverage-results.outputs.coverage }}
+          maxColorRange: 100
+          minColorRange: 0
