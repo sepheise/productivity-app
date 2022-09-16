@@ -47,7 +47,8 @@ jobs:
         with:
           name: tests-results
       - run: xcrun xccov view --report --json ResultBundle.xcresult > resultAsJson.json
-      - run: echo="coverage=$(cat resultAsJson.json | jq -r '.lineCoverage' | awk '{printf("%.1f",$1*100)}')" >> GITHUB_ENV
+      - run: cat resultAsJson.json | jq -r '.lineCoverage' | awk '{printf("%.1f",$1*100)}'
+      - run: echo=`coverage=$(cat resultAsJson.json | jq -r '.lineCoverage' | awk '{printf("%.1f",$1*100)}')` >> GITHUB_ENV
       - run: echo "${{ env.coverage }}"
       - id: save-coverage
         run: echo "::set-output name=coverage::${{ env.coverage }}"
