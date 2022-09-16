@@ -2,8 +2,7 @@ name: main-ci
 on: 
   push:
     branches:
-      # Changed temporary for branch work. Restore to main when finish.
-      - 'gather-and-show-coverage'
+      - 'main'
 jobs:
   test:
     runs-on: macos-12
