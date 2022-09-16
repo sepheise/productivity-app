@@ -62,7 +62,7 @@ jobs:
           filename: productivity-app-build-status.json
           label: Build
           message: ${{ needs.test.outputs.buildStatus == 'success' && 'passing' || 'failing' }}
-          color: green
+          color: brightgreen
           isError: ${{ needs.test.outputs.buildStatus != 'success' }}
       - name: Create test status badge
         uses: schneegans/dynamic-badges-action@v1.4.0
@@ -72,7 +72,7 @@ jobs:
           filename: productivity-app-test-status.json
           label: Tests
           message: ${{ needs.test.outputs.testStatus == 'success' && 'passing' || 'failing' }}
-          color: green
+          color: brightgreen
           isError: ${{ needs.test.outputs.testStatus != 'success' }}
       - name: Create coverage badge
         uses: schneegans/dynamic-badges-action@v1.4.0
@@ -80,7 +80,7 @@ jobs:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 5bea4737aa2970ee369b3116b8f2861d
           filename: productivity-app-coverage.json
-          label: Tests
+          label: Test Coverage
           message: ${{ needs.parse-coverage-results.outputs.coverage }}
           valColorRange: ${{ needs.parse-coverage-results.outputs.coverage }}
           maxColorRange: 100
