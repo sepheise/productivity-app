@@ -30,6 +30,23 @@ jobs:
         run: |
           xcodebuild test \
             -project ProductivityFW/ProductivityFW.xcodeproj \
-            -scheme CI \
+            -scheme CI CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -resultBundlePath build/ResultBundle.xcresult
-
+      - name: Save test status
+        run: echo "TEST_STATUS=${{ job.status }}" >> $GITHUB_ENV
+      - name: Creates test status badge
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: f766cc76b47b16757b8d724d198ddd52
+          filename: productivity-app-test-status.json
+          label: Test
+          message: ${{ env.TEST_STATUS == 'success' && 'passing' || 'failing' }}
+          color: green
+          isError: ${{ env.TEST_STATUS != 'success' }}
+  update-badges:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - run: echo "Build status is ${{ env.BUILD_STATUS }}"
+      - run: echo "Test status is ${{ env.TEST_STATUS }}"
