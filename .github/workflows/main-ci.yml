@@ -48,6 +48,7 @@ jobs:
           name: tests-results
       - run: xcrun xccov view --report --json ResultBundle.xcresult > resultAsJson.json
       - run: cov=$(cat resultAsJson.json | jq -r '.lineCoverage' | awk '{printf("%.1f",$1*100)}')
+      - run: echo $cov
       - id: save-coverage
         run: echo "::set-output name=coverage::$cov"
   update-badges:
