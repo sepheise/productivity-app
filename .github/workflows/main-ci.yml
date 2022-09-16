@@ -23,9 +23,9 @@ jobs:
           gistID: e6b6d639ed2a33d1d08b84237724ebe9
           filename: productivity-app-build-status.json
           label: Build
-          message: ${{ success() && 'passing' || 'failing' }}
+          message: ${{ env.BUILD_STATUS == 'success' && 'passing' || 'failing' }}
           color: green
-          isError: ${{ failure() }}
+          isError: ${{ env.BUILD_STATUS != 'success' }}
       - name: Run CI scheme Tests
         run: |
           xcodebuild test \
