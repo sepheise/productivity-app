@@ -26,7 +26,7 @@ jobs:
           xcodebuild test \
             -project ProductivityFW/ProductivityFW.xcodeproj \
             -scheme CI CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
-            -resultBundlePath build/ResultBundle.xcresult
+            -resultBundlePath results/ResultBundle.xcresult
       - name: Save tests status
         id: tests-status
         run: echo "::set-output name=status::${{ job.status }}"
@@ -34,10 +34,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: tests-results
-          path: build/ResultBundle.xcresult
+          path: results
           retention-days: 1
-  update-badges:
-    runs-on: ubuntu-latest
+  parse-coverage-results:
+    runs-on: macos-12
     needs: test
     steps:
       - name: Download tests results
@@ -45,6 +45,10 @@ jobs:
         with:
           name: tests-results
       - run: ls
+  update-badges:
+    runs-on: ubuntu-latest
+    needs: parse-coverage-results
+    steps:
       - name: Creates build status badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
