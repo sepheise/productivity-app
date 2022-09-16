@@ -2,7 +2,7 @@ name: main-ci
 on: 
   push:
     branches:
-      - 'setup-ci'
+      - 'main'
 jobs:
   test:
     runs-on: macos-12
