@@ -16,7 +16,14 @@ class GetNotesUseCase {
     }
 
     func getNotes(completion: @escaping (GetNotesResult) -> Void) {
-        completion(.success([]))
+        store.retrieve() { result in
+            switch result {
+            case .success:
+                completion(.success([]))
+            case .failure:
+                completion(.failure(.retrievalError))
+            }
+        }
     }
 }
 
@@ -41,6 +48,22 @@ class GetNotesUseCaseTests: XCTestCase {
         wait(for: [exp], timeout: 0.5)
 
         XCTAssertEqual(receivedResult, .success([]))
+    }
+
+    func test_getNotes_deliversErrorOnRetrievalError() {
+        let (sut, store) = makeSUT()
+        let exp = expectation(description: "Wait for get notes completion")
+        var receivedResult: GetNotesResult?
+
+        sut.getNotes() { result in
+            receivedResult = result
+            exp.fulfill()
+        }
+
+        store.completeRetrieval(with: .failure(anyNSError()))
+        wait(for: [exp], timeout: 0.5)
+
+        XCTAssertEqual(receivedResult, .failure(.retrievalError))
     }
 
     // MARK: - Helpers

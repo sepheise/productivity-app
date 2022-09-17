@@ -73,6 +73,9 @@ extension CoreDataNotesStore: NotesStore {
             })
         }
     }
+
+    public func retrieve(completion: @escaping (RetrievalResult) -> Void) {
+    }
 }
 
 private extension NSPersistentContainer {

@@ -17,6 +17,10 @@ class NotesStoreSpy: NotesStore {
         insertionCompletion = completion
     }
 
+    func retrieve(completion: @escaping (RetrievalResult) -> Void) {
+        retrievalCompletion = completion
+    }
+
     func completeInsertion(with result: InsertionResult) {
         insertionCompletion(result)
     }
