@@ -37,35 +37,19 @@ class GetNotesUseCaseTests: XCTestCase {
     func test_getNotes_deliversEmptyListOnNotFoundNotes() {
         let (sut, store) = makeSUT()
         let date = Date()
-        let exp = expectation(description: "Wait for get notes completion")
-        var receivedResult: GetNotesResult?
 
-        sut.getNotes(since: date) { result in
-            receivedResult = result
-            exp.fulfill()
-        }
-
-        store.completeRetrieval(with: .success([]))
-        wait(for: [exp], timeout: 0.5)
-
-        XCTAssertEqual(receivedResult, .success([]))
+        expect(sut: sut, withSinceDate: date, toCompleteWith: .success([]), when: {
+            store.completeRetrieval(with: .success([]))
+        })
     }
 
     func test_getNotes_deliversErrorOnRetrievalError() {
         let (sut, store) = makeSUT()
         let date = Date()
-        let exp = expectation(description: "Wait for get notes completion")
-        var receivedResult: GetNotesResult?
 
-        sut.getNotes(since: date) { result in
-            receivedResult = result
-            exp.fulfill()
-        }
-
-        store.completeRetrieval(with: .failure(anyNSError()))
-        wait(for: [exp], timeout: 0.5)
-
-        XCTAssertEqual(receivedResult, .failure(.retrievalError))
+        expect(sut: sut, withSinceDate: date, toCompleteWith: .failure(.retrievalError), when: {
+            store.completeRetrieval(with: .failure(anyNSError()))
+        })
     }
 
     func test_getNotes_requestsToRetrieveWithSinceDate() {
@@ -87,5 +71,20 @@ class GetNotesUseCaseTests: XCTestCase {
         trackForMemoryLeaks(store)
 
         return (sut, store)
+    }
+
+    private func expect(sut: GetNotesUseCase, withSinceDate date: Date, toCompleteWith expectedResult: GetNotesResult, when action: () -> Void = {}) {
+        let exp = expectation(description: "Wait for get notes completion")
+        var receivedResult: GetNotesResult?
+
+        sut.getNotes(since: date) { result in
+            receivedResult = result
+            exp.fulfill()
+        }
+
+        action()
+        wait(for: [exp], timeout: 0.5)
+
+        XCTAssertEqual(receivedResult, expectedResult)
     }
 }
