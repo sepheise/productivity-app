@@ -5,10 +5,12 @@
 //  Created by Patricio Sepúlveda Heise on 17-09-22.
 //
 
+import Foundation
 import ProductivityFW
 
 class NotesStoreSpy: NotesStore {
     var insertions = [LocalNote]()
+    var retrievals = [Date]()
     private var insertionCompletion: (InsertionResult) -> Void = { _ in }
     private var retrievalCompletion: (RetrievalResult) -> Void = { _ in }
 
@@ -17,7 +19,8 @@ class NotesStoreSpy: NotesStore {
         insertionCompletion = completion
     }
 
-    func retrieve(completion: @escaping (RetrievalResult) -> Void) {
+    func retrieve(since: Date, completion: @escaping (RetrievalResult) -> Void) {
+        retrievals.append(since)
         retrievalCompletion = completion
     }
 

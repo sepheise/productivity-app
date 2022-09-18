@@ -15,8 +15,8 @@ class GetNotesUseCase {
         self.store = store
     }
 
-    func getNotes(completion: @escaping (GetNotesResult) -> Void) {
-        store.retrieve() { result in
+    func getNotes(since date: Date, completion: @escaping (GetNotesResult) -> Void) {
+        store.retrieve(since: date) { result in
             switch result {
             case .success:
                 completion(.success([]))
@@ -36,10 +36,11 @@ typealias GetNotesResult = Result<[Note], GetNotesError>
 class GetNotesUseCaseTests: XCTestCase {
     func test_getNotes_deliversEmptyListOnNotFoundNotes() {
         let (sut, store) = makeSUT()
+        let date = Date()
         let exp = expectation(description: "Wait for get notes completion")
         var receivedResult: GetNotesResult?
 
-        sut.getNotes() { result in
+        sut.getNotes(since: date) { result in
             receivedResult = result
             exp.fulfill()
         }
@@ -52,10 +53,11 @@ class GetNotesUseCaseTests: XCTestCase {
 
     func test_getNotes_deliversErrorOnRetrievalError() {
         let (sut, store) = makeSUT()
+        let date = Date()
         let exp = expectation(description: "Wait for get notes completion")
         var receivedResult: GetNotesResult?
 
-        sut.getNotes() { result in
+        sut.getNotes(since: date) { result in
             receivedResult = result
             exp.fulfill()
         }
@@ -64,6 +66,15 @@ class GetNotesUseCaseTests: XCTestCase {
         wait(for: [exp], timeout: 0.5)
 
         XCTAssertEqual(receivedResult, .failure(.retrievalError))
+    }
+
+    func test_getNotes_requestsToRetrieveWithSinceDate() {
+        let (sut, store) = makeSUT()
+        let date = Date()
+
+        sut.getNotes(since: date) { _ in }
+
+        XCTAssertEqual(store.retrievals.first, date)
     }
 
     // MARK: - Helpers

@@ -74,7 +74,7 @@ extension CoreDataNotesStore: NotesStore {
         }
     }
 
-    public func retrieve(completion: @escaping (RetrievalResult) -> Void) {
+    public func retrieve(since date: Date, completion: @escaping (RetrievalResult) -> Void) {
     }
 }
 
