@@ -8,9 +8,9 @@
 import Foundation
 import ProductivityFW
 
-public func uniqueNote(content: String = "A note") -> (model: Note, local: LocalNote) {
-    let note = Note(id: UUID(), content: content, lastSavedAt: Date())
-    let localNote = LocalNote(id: note.id, content: content, lastSavedAt: note.lastSavedAt!)
+public func uniqueNote(content: String = "A note", lastUpdatedAt: Date = Date()) -> (model: Note, local: LocalNote) {
+    let note = Note(id: UUID(), content: content, lastUpdatedAt: lastUpdatedAt, lastSavedAt: Date())
+    let localNote = LocalNote(id: note.id, content: content, lastUpdatedAt: note.lastUpdatedAt, lastSavedAt: note.lastSavedAt!)
 
     return (note, localNote)
 }

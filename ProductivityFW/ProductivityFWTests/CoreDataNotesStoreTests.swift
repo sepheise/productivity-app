@@ -49,7 +49,7 @@ class CoreDataNotesStoreTests: XCTestCase {
 
         let _ = insert(note: note, on: sut)
 
-        let updatedNote = LocalNote(id: note.id, content: "Updated content", lastSavedAt: Date())
+        let updatedNote = LocalNote(id: note.id, content: "Updated content", lastUpdatedAt: note.lastUpdatedAt, lastSavedAt: Date())
 
         let insertionError = insert(note: updatedNote, on: sut)
         XCTAssertNil(insertionError)

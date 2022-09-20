@@ -12,11 +12,13 @@ import Foundation
 public struct LocalNote {
     public let id: UUID
     public let content: String
+    public let lastUpdatedAt: Date
     public let lastSavedAt: Date
 
-    public init(id: UUID, content: String, lastSavedAt: Date) {
+    public init(id: UUID, content: String, lastUpdatedAt: Date, lastSavedAt: Date) {
         self.id = id
         self.content = content
+        self.lastUpdatedAt = lastUpdatedAt
         self.lastSavedAt = lastSavedAt
     }
 }

@@ -11,6 +11,7 @@ import CoreData
 class ManagedNote: NSManagedObject {
     @NSManaged var id: UUID
     @NSManaged var content: String
+    @NSManaged var lastUpdatedAt: Date
     @NSManaged var lastSavedAt: Date
 }
 
