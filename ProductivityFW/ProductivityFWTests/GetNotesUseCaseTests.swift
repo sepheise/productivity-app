@@ -16,24 +16,30 @@ class GetNotesUseCase {
     }
 
     func getNotes(lastUpdatedSince date: Date, completion: @escaping (GetNotesResult) -> Void) {
-        store.retrieve(lastUpdatedSince: date) { [unowned self] result in
+        store.retrieve(lastUpdatedSince: date) { result in
             switch result {
             case .success(let localNotes):
-                completion(.success(self.filterNotes(localNotes, lastUpdatedSince: date).toModels()))
+                completion(.success(
+                    localNotes
+                        .filtered(sinceLastUpdated: date)
+                        .sortedByLastUpdated()
+                        .toModels()))
             case .failure:
                 completion(.failure(.retrievalError))
             }
         }
     }
-
-    private func filterNotes(_ notes: [LocalNote], lastUpdatedSince date: Date) -> [LocalNote] {
-        return notes.filter { note in
-            note.lastUpdatedAt >= date
-        }
-    }
 }
 
 private extension Array where Element == LocalNote {
+    func filtered(sinceLastUpdated date: Date) -> [LocalNote] {
+        return filter { $0.lastUpdatedAt >= date }
+    }
+
+    func sortedByLastUpdated() -> [LocalNote] {
+        return sorted { $0.lastUpdatedAt > $1.lastUpdatedAt }
+    }
+
     func toModels() -> [Note] {
         return map { Note(id: $0.id, content: $0.content, lastUpdatedAt: $0.lastUpdatedAt, lastSavedAt: $0.lastSavedAt) }
     }
@@ -73,7 +79,7 @@ class GetNotesUseCaseTests: XCTestCase {
         XCTAssertEqual(store.retrievals.first, date)
     }
 
-    func test_getNotes_deliversNotesLastUpdatedAfterSinceDate() {
+    func test_getNotes_deliversNotesLastUpdatedAfterSinceDateSortedByLastUpdatedAt() {
         let (sut, store) = makeSUT()
         let now = Date()
         let beginningOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
@@ -85,8 +91,8 @@ class GetNotesUseCaseTests: XCTestCase {
 
         expect(sut: sut, withSinceDate: beginningOfToday, toCompleteWith: .success(expectedNotes), when: {
             store.completeRetrieval(with: .success([
-                oneHourAgoNote.local,
                 twoHoursAgoNote.local,
+                oneHourAgoNote.local,
                 yesterdayNote.local
             ]))
         })
