@@ -85,6 +85,29 @@ class CoreDataNotesStoreTests: XCTestCase {
         wait(for: [exp], timeout: 0.5)
     }
 
+    func test_retrieveLastUpdatedSince_deliversEmptyOnNoNotesUpdatedSinceGivenDate() {
+        let sut = makeSUT()
+        let now = Date()
+        let startOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1)).local
+
+        let _ = insert(note: yesterdayNote, on: sut)
+
+        let exp = expectation(description: "Wait for Notes retrieval")
+
+        sut.retrieve(lastUpdatedSince: startOfToday) { result in
+            switch result {
+            case .success(let notes):
+                XCTAssertEqual(notes, [])
+            case .failure(let error):
+                XCTFail("Expected success, got error: \(String(describing: error)) instead.")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 0.5)
+    }
+
     // MARK: - Helpers
 
     private func makeSUT() -> CoreDataNotesStore {
