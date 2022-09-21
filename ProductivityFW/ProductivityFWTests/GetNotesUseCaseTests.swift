@@ -8,49 +8,6 @@
 import XCTest
 import ProductivityFW
 
-class GetNotesUseCase {
-    private let store: NotesStore
-
-    init(store: NotesStore) {
-        self.store = store
-    }
-
-    func getNotes(lastUpdatedSince date: Date, completion: @escaping (GetNotesResult) -> Void) {
-        store.retrieve(lastUpdatedSince: date) { result in
-            switch result {
-            case .success(let localNotes):
-                completion(.success(
-                    localNotes
-                        .filtered(sinceLastUpdated: date)
-                        .sortedByLastUpdated()
-                        .toModels()))
-            case .failure:
-                completion(.failure(.retrievalError))
-            }
-        }
-    }
-}
-
-private extension Array where Element == LocalNote {
-    func filtered(sinceLastUpdated date: Date) -> [LocalNote] {
-        return filter { $0.lastUpdatedAt >= date }
-    }
-
-    func sortedByLastUpdated() -> [LocalNote] {
-        return sorted { $0.lastUpdatedAt > $1.lastUpdatedAt }
-    }
-
-    func toModels() -> [Note] {
-        return map { Note(id: $0.id, content: $0.content, lastUpdatedAt: $0.lastUpdatedAt, lastSavedAt: $0.lastSavedAt) }
-    }
-}
-
-enum GetNotesError: Error {
-    case retrievalError
-}
-
-typealias GetNotesResult = Result<[Note], GetNotesError>
-
 class GetNotesUseCaseTests: XCTestCase {
     func test_getNotes_deliversEmptyListOnNotFoundNotes() {
         let (sut, store) = makeSUT()
