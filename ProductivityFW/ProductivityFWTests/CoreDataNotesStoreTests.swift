@@ -84,6 +84,33 @@ class CoreDataNotesStoreTests: XCTestCase {
         expect(sut, toRetrieveLastUpdated: .success([]), since: startOfToday)
     }
 
+    func test_retrieveLastUpdatedSince_hasNoSideEffectsOnLastUpdatedSinceGivenDate() {
+        let sut = makeSUT()
+        let now = Date()
+        let startOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let oneHourAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -1)).local
+        let twoHoursAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -2)).local
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1)).local
+        let expectedRetrivedNotes = [oneHourAgoNote, twoHoursAgoNote]
+
+        let _ = insert(note: oneHourAgoNote, on: sut)
+        let _ = insert(note: twoHoursAgoNote, on: sut)
+        let _ = insert(note: yesterdayNote, on: sut)
+
+        expect(sut, toRetrieveLastUpdatedTwice: .success(expectedRetrivedNotes), since: startOfToday)
+    }
+
+    func test_retrieveLastUpdatedSince_hasNoSideEffectsOnNoNotesUpdatedSinceGivenDate() {
+        let sut = makeSUT()
+        let now = Date()
+        let startOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1)).local
+
+        let _ = insert(note: yesterdayNote, on: sut)
+
+        expect(sut, toRetrieveLastUpdatedTwice: .success([]), since: startOfToday)
+    }
+
     // MARK: - Helpers
 
     private func makeSUT() -> CoreDataNotesStore {
@@ -149,6 +176,11 @@ class CoreDataNotesStoreTests: XCTestCase {
     private func expect(_ sut: CoreDataNotesStore, with id: UUID, toRetrieveTwice expectedResult: Result<LocalNote?, RetrievalError>) {
         expect(sut, with: id, toRetrieve: expectedResult)
         expect(sut, with: id, toRetrieve: expectedResult)
+    }
+
+    private func expect(_ sut: CoreDataNotesStore, toRetrieveLastUpdatedTwice expectedResult: RetrievalResult, since date: Date) {
+        expect(sut, toRetrieveLastUpdated: expectedResult, since: date)
+        expect(sut, toRetrieveLastUpdated: expectedResult, since: date)
     }
 
     private enum RetrievalError: Error {
