@@ -70,19 +70,7 @@ class CoreDataNotesStoreTests: XCTestCase {
         let _ = insert(note: twoHoursAgoNote, on: sut)
         let _ = insert(note: yesterdayNote, on: sut)
 
-        let exp = expectation(description: "Wait for Notes retrieval")
-
-        sut.retrieve(lastUpdatedSince: startOfToday) { result in
-            switch result {
-            case .success(let notes):
-                XCTAssertEqual(notes, expectedRetrivedNotes)
-            case .failure(let error):
-                XCTFail("Expected success, got error: \(String(describing: error)) instead.")
-            }
-            exp.fulfill()
-        }
-
-        wait(for: [exp], timeout: 0.5)
+        expect(sut, toRetrieveLastUpdated: .success(expectedRetrivedNotes), since: startOfToday)
     }
 
     func test_retrieveLastUpdatedSince_deliversEmptyOnNoNotesUpdatedSinceGivenDate() {
@@ -93,19 +81,7 @@ class CoreDataNotesStoreTests: XCTestCase {
 
         let _ = insert(note: yesterdayNote, on: sut)
 
-        let exp = expectation(description: "Wait for Notes retrieval")
-
-        sut.retrieve(lastUpdatedSince: startOfToday) { result in
-            switch result {
-            case .success(let notes):
-                XCTAssertEqual(notes, [])
-            case .failure(let error):
-                XCTFail("Expected success, got error: \(String(describing: error)) instead.")
-            }
-            exp.fulfill()
-        }
-
-        wait(for: [exp], timeout: 0.5)
+        expect(sut, toRetrieveLastUpdated: .success([]), since: startOfToday)
     }
 
     // MARK: - Helpers
@@ -148,6 +124,22 @@ class CoreDataNotesStoreTests: XCTestCase {
                 XCTFail("Expected to retrieve \(String(describing: expectedResult)), got \(String(describing: retrievedResult)) instead")
             }
 
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 0.5)
+    }
+
+    private func expect(_ sut: CoreDataNotesStore, toRetrieveLastUpdated expectedResult: RetrievalResult, since date: Date) {
+        let exp = expectation(description: "Wait for Notes retrieval")
+
+        sut.retrieve(lastUpdatedSince: date) { retrievedResult in
+            switch (expectedResult, retrievedResult) {
+            case (.success(let expectedNotes), .success(let retrievedNotes)):
+                XCTAssertEqual(expectedNotes, retrievedNotes)
+            default:
+                XCTFail("Expected to retrieve \(String(describing: expectedResult)), got \(String(describing: retrievedResult)) instead")
+            }
             exp.fulfill()
         }
 
