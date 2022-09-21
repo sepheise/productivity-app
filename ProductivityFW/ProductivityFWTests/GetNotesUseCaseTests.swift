@@ -15,15 +15,27 @@ class GetNotesUseCase {
         self.store = store
     }
 
-    func getNotes(since date: Date, completion: @escaping (GetNotesResult) -> Void) {
-        store.retrieve(since: date) { result in
+    func getNotes(lastUpdatedSince date: Date, completion: @escaping (GetNotesResult) -> Void) {
+        store.retrieve(lastUpdatedSince: date) { [unowned self] result in
             switch result {
-            case .success:
-                completion(.success([]))
+            case .success(let localNotes):
+                completion(.success(self.filterNotes(localNotes, lastUpdatedSince: date).toModels()))
             case .failure:
                 completion(.failure(.retrievalError))
             }
         }
+    }
+
+    private func filterNotes(_ notes: [LocalNote], lastUpdatedSince date: Date) -> [LocalNote] {
+        return notes.filter { note in
+            note.lastUpdatedAt >= date
+        }
+    }
+}
+
+private extension Array where Element == LocalNote {
+    func toModels() -> [Note] {
+        return map { Note(id: $0.id, content: $0.content, lastUpdatedAt: $0.lastUpdatedAt, lastSavedAt: $0.lastSavedAt) }
     }
 }
 
@@ -56,9 +68,28 @@ class GetNotesUseCaseTests: XCTestCase {
         let (sut, store) = makeSUT()
         let date = Date()
 
-        sut.getNotes(since: date) { _ in }
+        sut.getNotes(lastUpdatedSince: date) { _ in }
 
         XCTAssertEqual(store.retrievals.first, date)
+    }
+
+    func test_getNotes_deliversNotesLastUpdatedAfterSinceDate() {
+        let (sut, store) = makeSUT()
+        let now = Date()
+        let beginningOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let oneHourAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -1))
+        let twoHoursAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -2))
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1))
+
+        let expectedNotes: [Note] = [oneHourAgoNote.model, twoHoursAgoNote.model]
+
+        expect(sut: sut, withSinceDate: beginningOfToday, toCompleteWith: .success(expectedNotes), when: {
+            store.completeRetrieval(with: .success([
+                oneHourAgoNote.local,
+                twoHoursAgoNote.local,
+                yesterdayNote.local
+            ]))
+        })
     }
 
     // MARK: - Helpers
@@ -77,7 +108,7 @@ class GetNotesUseCaseTests: XCTestCase {
         let exp = expectation(description: "Wait for get notes completion")
         var receivedResult: GetNotesResult?
 
-        sut.getNotes(since: date) { result in
+        sut.getNotes(lastUpdatedSince: date) { result in
             receivedResult = result
             exp.fulfill()
         }
@@ -86,5 +117,15 @@ class GetNotesUseCaseTests: XCTestCase {
         wait(for: [exp], timeout: 0.5)
 
         XCTAssertEqual(receivedResult, expectedResult)
+    }
+}
+
+private extension Date {
+    func adding(hours: Int) -> Date {
+        return Calendar(identifier: .gregorian).date(byAdding: .hour, value: hours, to: self)!
+    }
+
+    func adding(days: Int) -> Date {
+        return Calendar(identifier: .gregorian).date(byAdding: .day, value: days, to: self)!
     }
 }

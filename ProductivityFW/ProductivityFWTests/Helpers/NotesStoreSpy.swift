@@ -19,8 +19,8 @@ class NotesStoreSpy: NotesStore {
         insertionCompletion = completion
     }
 
-    func retrieve(since: Date, completion: @escaping (RetrievalResult) -> Void) {
-        retrievals.append(since)
+    func retrieve(lastUpdatedSince date: Date, completion: @escaping (RetrievalResult) -> Void) {
+        retrievals.append(date)
         retrievalCompletion = completion
     }
 

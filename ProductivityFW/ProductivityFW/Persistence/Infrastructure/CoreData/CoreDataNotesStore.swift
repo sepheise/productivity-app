@@ -76,8 +76,7 @@ extension CoreDataNotesStore: NotesStore {
         }
     }
 
-    public func retrieve(since date: Date, completion: @escaping (RetrievalResult) -> Void) {
-    }
+    public func retrieve(lastUpdatedSince date: Date, completion: @escaping (RetrievalResult) -> Void) {}
 }
 
 private extension NSPersistentContainer {

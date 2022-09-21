@@ -14,5 +14,5 @@ public typealias RetrievalResult = Result<[LocalNote], Error>
 public protocol NotesStore {
     func insert(note: LocalNote, completion: @escaping (InsertionResult) -> Void)
 
-    func retrieve(since: Date, completion: @escaping (RetrievalResult) -> Void)
+    func retrieve(lastUpdatedSince: Date, completion: @escaping (RetrievalResult) -> Void)
 }
