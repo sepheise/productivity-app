@@ -23,4 +23,11 @@ extension ManagedNote {
         request.fetchLimit = 1
         return try context.fetch(request).first
     }
+
+    static func find(lastUpdatedSince: Date, in context: NSManagedObjectContext) throws -> [ManagedNote] {
+        let request = NSFetchRequest<ManagedNote>(entityName: entity().name!)
+        request.predicate = NSPredicate(format: "%K >= %@", argumentArray: [#keyPath(ManagedNote.lastUpdatedAt), lastUpdatedSince])
+        request.sortDescriptors = [NSSortDescriptor(key: "lastUpdatedAt", ascending: false)]
+        return try context.fetch(request)
+    }
 }

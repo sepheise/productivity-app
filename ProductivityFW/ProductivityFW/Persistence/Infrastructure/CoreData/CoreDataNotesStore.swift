@@ -76,7 +76,16 @@ extension CoreDataNotesStore: NotesStore {
         }
     }
 
-    public func retrieve(lastUpdatedSince date: Date, completion: @escaping (RetrievalResult) -> Void) {}
+    public func retrieve(lastUpdatedSince date: Date, completion: @escaping (RetrievalResult) -> Void) {
+        let context = self.context
+        context.perform {
+            completion(Result {
+                let retrievedNotes = try ManagedNote.find(lastUpdatedSince: date, in: context)
+
+                return retrievedNotes.map { LocalNote(id: $0.id, content: $0.content, lastUpdatedAt: $0.lastUpdatedAt, lastSavedAt: $0.lastSavedAt) }
+            })
+        }
+    }
 }
 
 private extension NSPersistentContainer {

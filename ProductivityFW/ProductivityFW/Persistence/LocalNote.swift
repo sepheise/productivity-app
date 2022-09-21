@@ -9,7 +9,7 @@ import Foundation
 
 /// A Persistence specific Note model.
 /// Persistence components should depend on this, instead domain's Note.
-public struct LocalNote {
+public struct LocalNote: Equatable {
     public let id: UUID
     public let content: String
     public let lastUpdatedAt: Date
