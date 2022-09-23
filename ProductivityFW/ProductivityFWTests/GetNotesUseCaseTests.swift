@@ -55,6 +55,21 @@ class GetNotesUseCaseTests: XCTestCase {
         })
     }
 
+    func test_getNotes_doesNotDeliverErrorAfterInstanceHasBeenDeallocated() {
+        let store = NotesStoreSpy()
+        var sut: GetNotesUseCase? = GetNotesUseCase(store: store)
+        let now = Date()
+        let beginningOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+
+        var receivedResults = [GetNotesResult]()
+        sut?.getNotes(lastUpdatedSince: beginningOfToday) { receivedResults.append($0) }
+
+        sut = nil
+        store.completeRetrieval(with: .failure(anyNSError()))
+
+        XCTAssertTrue(receivedResults.isEmpty)
+    }
+
     // MARK: - Helpers
 
     private func makeSUT() -> (sut: GetNotesUseCase, store: NotesStoreSpy) {

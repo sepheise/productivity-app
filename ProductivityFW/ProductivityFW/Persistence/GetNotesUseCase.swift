@@ -15,7 +15,9 @@ public class GetNotesUseCase {
     }
 
     public func getNotes(lastUpdatedSince date: Date, completion: @escaping (GetNotesResult) -> Void) {
-        store.retrieve(lastUpdatedSince: date) { result in
+        store.retrieve(lastUpdatedSince: date) { [weak self] result in
+            guard let _ = self else { return }
+
             switch result {
             case .success(let localNotes):
                 completion(.success(

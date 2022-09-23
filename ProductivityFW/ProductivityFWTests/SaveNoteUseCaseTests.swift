@@ -58,6 +58,35 @@ class SaveNoteUseCaseTests: XCTestCase {
         }
     }
 
+    func test_save_doesNoteSaveNotesAfterInstanceHasBeenDeallocated() {
+        let store = NotesStoreSpy()
+        let note = uniqueNote()
+        var sut: SaveNoteUseCase? = SaveNoteUseCase(store: store, currentDate: { Date() })
+
+        var receivedResults = [SaveNoteResult]()
+
+        sut?.save(note: note.model) { receivedResults.append($0) }
+
+        sut = nil
+        store.completeInsertion(with: .success(note.local))
+
+        XCTAssertTrue(receivedResults.isEmpty)
+    }
+
+    func test_save_doesNotDeliverErrorAfterInstanceHasBeenDeallocated() {
+        let store = NotesStoreSpy()
+        var sut: SaveNoteUseCase? = SaveNoteUseCase(store: store, currentDate: { Date() })
+
+        var receivedResults = [SaveNoteResult]()
+
+        sut?.save(note: uniqueNote().model) { receivedResults.append($0) }
+
+        sut = nil
+        store.completeInsertion(with: .failure(anyNSError()))
+
+        XCTAssertTrue(receivedResults.isEmpty)
+    }
+
     // MARK: - Helpers
 
     private func makeSUT(currentDate: @escaping () -> Date = Date.init) -> (sut: SaveNoteUseCase, store: NotesStoreSpy) {
