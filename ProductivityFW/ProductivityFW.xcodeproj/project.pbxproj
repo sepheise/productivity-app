@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		51A614BB28D68CC30002A4C8 /* XCTestCase+TrackForMemoryLeaks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A614BA28D68CC30002A4C8 /* XCTestCase+TrackForMemoryLeaks.swift */; };
+		51A614BD28D68EF60002A4C8 /* NotesStoreSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A614BC28D68EF60002A4C8 /* NotesStoreSpy.swift */; };
+		51A614BF28D68F6B0002A4C8 /* GetNotesUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A614BE28D68F6B0002A4C8 /* GetNotesUseCaseTests.swift */; };
+		51A614C128DB67FE0002A4C8 /* GetNotesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A614C028DB67FE0002A4C8 /* GetNotesUseCase.swift */; };
 		51F4D60D28D16772007D92EC /* ProductivityFW.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51F4D60428D16772007D92EC /* ProductivityFW.framework */; };
 		51F4D61D28D16886007D92EC /* SaveNoteUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F4D61C28D16886007D92EC /* SaveNoteUseCaseTests.swift */; };
 		51F4D61F28D16AC7007D92EC /* SaveNoteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F4D61E28D16AC7007D92EC /* SaveNoteUseCase.swift */; };
@@ -31,6 +35,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		51A614BA28D68CC30002A4C8 /* XCTestCase+TrackForMemoryLeaks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+TrackForMemoryLeaks.swift"; sourceTree = "<group>"; };
+		51A614BC28D68EF60002A4C8 /* NotesStoreSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesStoreSpy.swift; sourceTree = "<group>"; };
+		51A614BE28D68F6B0002A4C8 /* GetNotesUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNotesUseCaseTests.swift; sourceTree = "<group>"; };
+		51A614C028DB67FE0002A4C8 /* GetNotesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNotesUseCase.swift; sourceTree = "<group>"; };
 		51F4D60428D16772007D92EC /* ProductivityFW.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProductivityFW.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		51F4D60C28D16772007D92EC /* ProductivityFWTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProductivityFWTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		51F4D61C28D16886007D92EC /* SaveNoteUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveNoteUseCaseTests.swift; sourceTree = "<group>"; };
@@ -97,6 +105,7 @@
 				51F4D63828D3A9F2007D92EC /* Helpers */,
 				51F4D61C28D16886007D92EC /* SaveNoteUseCaseTests.swift */,
 				51F4D62428D22FCA007D92EC /* CoreDataNotesStoreTests.swift */,
+				51A614BE28D68F6B0002A4C8 /* GetNotesUseCaseTests.swift */,
 			);
 			path = ProductivityFWTests;
 			sourceTree = "<group>";
@@ -134,6 +143,7 @@
 				51F4D62228D1721A007D92EC /* NotesStore.swift */,
 				51F4D61E28D16AC7007D92EC /* SaveNoteUseCase.swift */,
 				51F4D63628D3687E007D92EC /* LocalNote.swift */,
+				51A614C028DB67FE0002A4C8 /* GetNotesUseCase.swift */,
 			);
 			path = Persistence;
 			sourceTree = "<group>";
@@ -142,6 +152,8 @@
 			isa = PBXGroup;
 			children = (
 				51F4D63A28D3AA41007D92EC /* PersistenceTestHelpers.swift */,
+				51A614BA28D68CC30002A4C8 /* XCTestCase+TrackForMemoryLeaks.swift */,
+				51A614BC28D68EF60002A4C8 /* NotesStoreSpy.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -258,6 +270,7 @@
 			files = (
 				51F4D62328D1721A007D92EC /* NotesStore.swift in Sources */,
 				51F4D62F28D25BF2007D92EC /* ManagedNote.swift in Sources */,
+				51A614C128DB67FE0002A4C8 /* GetNotesUseCase.swift in Sources */,
 				51F4D62B28D2426E007D92EC /* NotesStore.xcdatamodeld in Sources */,
 				51F4D61F28D16AC7007D92EC /* SaveNoteUseCase.swift in Sources */,
 				51F4D62D28D2454D007D92EC /* CoreDataNotesStore.swift in Sources */,
@@ -272,6 +285,9 @@
 			files = (
 				51F4D63B28D3AA41007D92EC /* PersistenceTestHelpers.swift in Sources */,
 				51F4D61D28D16886007D92EC /* SaveNoteUseCaseTests.swift in Sources */,
+				51A614BD28D68EF60002A4C8 /* NotesStoreSpy.swift in Sources */,
+				51A614BB28D68CC30002A4C8 /* XCTestCase+TrackForMemoryLeaks.swift in Sources */,
+				51A614BF28D68F6B0002A4C8 /* GetNotesUseCaseTests.swift in Sources */,
 				51F4D62528D22FCA007D92EC /* CoreDataNotesStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

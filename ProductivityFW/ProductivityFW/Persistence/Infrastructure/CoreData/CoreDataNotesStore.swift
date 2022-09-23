@@ -45,16 +45,18 @@ extension CoreDataNotesStore: NotesStore {
                 if let existingNote = existingNote {
                     existingNote.content = note.content
                     existingNote.lastSavedAt = note.lastSavedAt
+                    existingNote.lastUpdatedAt = note.lastUpdatedAt
                 } else {
                     let newNote = ManagedNote(context: context)
                     newNote.id = note.id
                     newNote.content = note.content
                     newNote.lastSavedAt = note.lastSavedAt
+                    newNote.lastUpdatedAt = note.lastUpdatedAt
                 }
 
                 try context.save()
 
-                return LocalNote(id: note.id, content: note.content, lastSavedAt: note.lastSavedAt)
+                return LocalNote(id: note.id, content: note.content, lastUpdatedAt: note.lastUpdatedAt, lastSavedAt: note.lastSavedAt)
             })
         }
     }
@@ -69,7 +71,18 @@ extension CoreDataNotesStore: NotesStore {
                     return .none
                 }
 
-                return LocalNote(id: retrievedNote.id, content: retrievedNote.content, lastSavedAt: retrievedNote.lastSavedAt)
+                return LocalNote(id: retrievedNote.id, content: retrievedNote.content, lastUpdatedAt: retrievedNote.lastUpdatedAt, lastSavedAt: retrievedNote.lastSavedAt)
+            })
+        }
+    }
+
+    public func retrieve(lastUpdatedSince date: Date, completion: @escaping (RetrievalResult) -> Void) {
+        let context = self.context
+        context.perform {
+            completion(Result {
+                let retrievedNotes = try ManagedNote.find(lastUpdatedSince: date, in: context)
+
+                return retrievedNotes.map { LocalNote(id: $0.id, content: $0.content, lastUpdatedAt: $0.lastUpdatedAt, lastSavedAt: $0.lastSavedAt) }
             })
         }
     }

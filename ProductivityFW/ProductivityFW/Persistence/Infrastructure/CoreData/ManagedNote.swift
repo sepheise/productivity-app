@@ -11,6 +11,7 @@ import CoreData
 class ManagedNote: NSManagedObject {
     @NSManaged var id: UUID
     @NSManaged var content: String
+    @NSManaged var lastUpdatedAt: Date
     @NSManaged var lastSavedAt: Date
 }
 
@@ -21,5 +22,12 @@ extension ManagedNote {
         request.returnsObjectsAsFaults = false
         request.fetchLimit = 1
         return try context.fetch(request).first
+    }
+
+    static func find(lastUpdatedSince: Date, in context: NSManagedObjectContext) throws -> [ManagedNote] {
+        let request = NSFetchRequest<ManagedNote>(entityName: entity().name!)
+        request.predicate = NSPredicate(format: "%K >= %@", argumentArray: [#keyPath(ManagedNote.lastUpdatedAt), lastUpdatedSince])
+        request.sortDescriptors = [NSSortDescriptor(key: "lastUpdatedAt", ascending: false)]
+        return try context.fetch(request)
     }
 }

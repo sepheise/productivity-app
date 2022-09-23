@@ -58,6 +58,37 @@ class SaveNoteUseCaseTests: XCTestCase {
         }
     }
 
+    func test_save_doesNoteSaveNotesAfterInstanceHasBeenDeallocated() {
+        let store = NotesStoreSpy()
+        let note = uniqueNote()
+        var sut: SaveNoteUseCase? = SaveNoteUseCase(store: store, currentDate: { Date() })
+
+        var receivedResults = [SaveNoteResult]()
+
+        sut?.save(note: note.model) { receivedResults.append($0) }
+
+        sut = nil
+        store.completeInsertion(with: .success(note.local))
+
+        XCTAssertTrue(receivedResults.isEmpty)
+    }
+
+    func test_save_doesNotDeliverErrorAfterInstanceHasBeenDeallocated() {
+        let store = NotesStoreSpy()
+        var sut: SaveNoteUseCase? = SaveNoteUseCase(store: store, currentDate: { Date() })
+
+        var receivedResults = [SaveNoteResult]()
+
+        sut?.save(note: uniqueNote().model) { receivedResults.append($0) }
+
+        sut = nil
+        store.completeInsertion(with: .failure(anyNSError()))
+
+        XCTAssertTrue(receivedResults.isEmpty)
+    }
+
+    // MARK: - Helpers
+
     private func makeSUT(currentDate: @escaping () -> Date = Date.init) -> (sut: SaveNoteUseCase, store: NotesStoreSpy) {
         let store = NotesStoreSpy()
         let sut = SaveNoteUseCase(store: store, currentDate: currentDate)
@@ -66,13 +97,7 @@ class SaveNoteUseCaseTests: XCTestCase {
         trackForMemoryLeaks(store)
 
         return (sut, store)
-    }
-
-    func trackForMemoryLeaks(_ instance: AnyObject) {
-        addTeardownBlock { [weak instance] in
-            XCTAssertNil(instance, "Instance of \(String(describing: instance)) should have been deallocated. Potential Memory leak.")
-        }
-    }
+    }    
 
     private func expect(sut: SaveNoteUseCase, with note: Note, toCompleteWith expectedResult: SaveNoteResult, when action: () -> Void = {}) {
         let exp = expectation(description: "Wait for save note completion")
@@ -87,19 +112,5 @@ class SaveNoteUseCaseTests: XCTestCase {
         wait(for: [exp], timeout: 0.5)
 
         XCTAssertEqual(receivedResult, expectedResult)
-    }
-}
-
-class NotesStoreSpy: NotesStore {
-    var insertions = [LocalNote]()
-    private var insertionCompletion: (InsertionResult) -> Void = { _ in }
-
-    func insert(note: LocalNote, completion: @escaping (InsertionResult) -> Void) {
-        insertions.append(note)
-        insertionCompletion = completion
-    }
-
-    func completeInsertion(with result: InsertionResult) {
-        insertionCompletion(result)
     }
 }

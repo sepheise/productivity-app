@@ -49,12 +49,66 @@ class CoreDataNotesStoreTests: XCTestCase {
 
         let _ = insert(note: note, on: sut)
 
-        let updatedNote = LocalNote(id: note.id, content: "Updated content", lastSavedAt: Date())
+        let updatedNote = LocalNote(id: note.id, content: "Updated content", lastUpdatedAt: note.lastUpdatedAt, lastSavedAt: Date())
 
         let insertionError = insert(note: updatedNote, on: sut)
         XCTAssertNil(insertionError)
 
         expect(sut, with: note.id, toRetrieve: .success(updatedNote))
+    }
+
+    func test_retrieveLastUpdatedSince_deliversNotesLastUpdatedSinceGivenDate() {
+        let sut = makeSUT()
+        let now = Date()
+        let startOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let oneHourAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -1)).local
+        let twoHoursAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -2)).local
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1)).local
+        let expectedRetrivedNotes = [oneHourAgoNote, twoHoursAgoNote]
+
+        let _ = insert(note: oneHourAgoNote, on: sut)
+        let _ = insert(note: twoHoursAgoNote, on: sut)
+        let _ = insert(note: yesterdayNote, on: sut)
+
+        expect(sut, toRetrieveLastUpdated: .success(expectedRetrivedNotes), since: startOfToday)
+    }
+
+    func test_retrieveLastUpdatedSince_deliversEmptyOnNoNotesUpdatedSinceGivenDate() {
+        let sut = makeSUT()
+        let now = Date()
+        let startOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1)).local
+
+        let _ = insert(note: yesterdayNote, on: sut)
+
+        expect(sut, toRetrieveLastUpdated: .success([]), since: startOfToday)
+    }
+
+    func test_retrieveLastUpdatedSince_hasNoSideEffectsOnLastUpdatedSinceGivenDate() {
+        let sut = makeSUT()
+        let now = Date()
+        let startOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let oneHourAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -1)).local
+        let twoHoursAgoNote = uniqueNote(lastUpdatedAt: now.adding(hours: -2)).local
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1)).local
+        let expectedRetrivedNotes = [oneHourAgoNote, twoHoursAgoNote]
+
+        let _ = insert(note: oneHourAgoNote, on: sut)
+        let _ = insert(note: twoHoursAgoNote, on: sut)
+        let _ = insert(note: yesterdayNote, on: sut)
+
+        expect(sut, toRetrieveLastUpdatedTwice: .success(expectedRetrivedNotes), since: startOfToday)
+    }
+
+    func test_retrieveLastUpdatedSince_hasNoSideEffectsOnNoNotesUpdatedSinceGivenDate() {
+        let sut = makeSUT()
+        let now = Date()
+        let startOfToday = Calendar(identifier: .gregorian).startOfDay(for: now)
+        let yesterdayNote = uniqueNote(lastUpdatedAt: now.adding(days: -1)).local
+
+        let _ = insert(note: yesterdayNote, on: sut)
+
+        expect(sut, toRetrieveLastUpdatedTwice: .success([]), since: startOfToday)
     }
 
     // MARK: - Helpers
@@ -78,7 +132,7 @@ class CoreDataNotesStoreTests: XCTestCase {
         return insertionError
     }
 
-    private func expect(_ sut: CoreDataNotesStore, with id: UUID, toRetrieve expectedResult: RetrievalResult) {
+    private func expect(_ sut: CoreDataNotesStore, with id: UUID, toRetrieve expectedResult: Result<LocalNote?, RetrievalError>) {
 
         let exp = expectation(description: "Wait for Note retrieval")
 
@@ -103,14 +157,43 @@ class CoreDataNotesStoreTests: XCTestCase {
         wait(for: [exp], timeout: 0.5)
     }
 
-    private func expect(_ sut: CoreDataNotesStore, with id: UUID, toRetrieveTwice expectedResult: RetrievalResult) {
+    private func expect(_ sut: CoreDataNotesStore, toRetrieveLastUpdated expectedResult: RetrievalResult, since date: Date) {
+        let exp = expectation(description: "Wait for Notes retrieval")
+
+        sut.retrieve(lastUpdatedSince: date) { retrievedResult in
+            switch (expectedResult, retrievedResult) {
+            case (.success(let expectedNotes), .success(let retrievedNotes)):
+                XCTAssertEqual(expectedNotes, retrievedNotes)
+            default:
+                XCTFail("Expected to retrieve \(String(describing: expectedResult)), got \(String(describing: retrievedResult)) instead")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 0.5)
+    }
+
+    private func expect(_ sut: CoreDataNotesStore, with id: UUID, toRetrieveTwice expectedResult: Result<LocalNote?, RetrievalError>) {
         expect(sut, with: id, toRetrieve: expectedResult)
         expect(sut, with: id, toRetrieve: expectedResult)
     }
 
-    private typealias RetrievalResult = Result<LocalNote?, RetrievalError>
+    private func expect(_ sut: CoreDataNotesStore, toRetrieveLastUpdatedTwice expectedResult: RetrievalResult, since date: Date) {
+        expect(sut, toRetrieveLastUpdated: expectedResult, since: date)
+        expect(sut, toRetrieveLastUpdated: expectedResult, since: date)
+    }
 
     private enum RetrievalError: Error {
         case error
+    }
+}
+
+private extension Date {
+    func adding(hours: Int) -> Date {
+        return Calendar(identifier: .gregorian).date(byAdding: .hour, value: hours, to: self)!
+    }
+
+    func adding(days: Int) -> Date {
+        return Calendar(identifier: .gregorian).date(byAdding: .day, value: days, to: self)!
     }
 }
