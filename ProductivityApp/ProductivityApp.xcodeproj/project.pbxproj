@@ -14,6 +14,8 @@
 		5152F70528F73308001383AF /* ProductivityAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5152F70428F73308001383AF /* ProductivityAppTests.swift */; };
 		5152F70F28F73308001383AF /* ProductivityAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5152F70E28F73308001383AF /* ProductivityAppUITests.swift */; };
 		5152F71128F73308001383AF /* ProductivityAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5152F71028F73308001383AF /* ProductivityAppUITestsLaunchTests.swift */; };
+		5152F72B28F73774001383AF /* ProductivityFW.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5152F72A28F73774001383AF /* ProductivityFW.framework */; };
+		5152F72C28F73774001383AF /* ProductivityFW.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5152F72A28F73774001383AF /* ProductivityFW.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		5152F72D28F73774001383AF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5152F72C28F73774001383AF /* ProductivityFW.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		5152F6EF28F73308001383AF /* ProductivityApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProductivityApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5152F6F228F73308001383AF /* ProductivityApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductivityApp.swift; sourceTree = "<group>"; };
@@ -45,6 +61,7 @@
 		5152F70A28F73308001383AF /* ProductivityAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProductivityAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5152F70E28F73308001383AF /* ProductivityAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductivityAppUITests.swift; sourceTree = "<group>"; };
 		5152F71028F73308001383AF /* ProductivityAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductivityAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		5152F72A28F73774001383AF /* ProductivityFW.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ProductivityFW.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5152F72B28F73774001383AF /* ProductivityFW.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +97,7 @@
 				5152F70328F73308001383AF /* ProductivityAppTests */,
 				5152F70D28F73308001383AF /* ProductivityAppUITests */,
 				5152F6F028F73308001383AF /* Products */,
+				5152F72928F73774001383AF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -129,6 +148,14 @@
 			path = ProductivityAppUITests;
 			sourceTree = "<group>";
 		};
+		5152F72928F73774001383AF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5152F72A28F73774001383AF /* ProductivityFW.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -139,6 +166,7 @@
 				5152F6EB28F73308001383AF /* Sources */,
 				5152F6EC28F73308001383AF /* Frameworks */,
 				5152F6ED28F73308001383AF /* Resources */,
+				5152F72D28F73774001383AF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
