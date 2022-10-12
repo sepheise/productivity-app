@@ -17,7 +17,7 @@
                BlueprintIdentifier = "51F4D60328D16772007D92EC"
                BuildableName = "ProductivityFW.framework"
                BlueprintName = "ProductivityFW"
-               ReferencedContainer = "container:ProductivityFW.xcodeproj">
+               ReferencedContainer = "container:ProductivityFW/ProductivityFW.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -38,7 +38,19 @@
                BlueprintIdentifier = "51F4D60B28D16772007D92EC"
                BuildableName = "ProductivityFWTests.xctest"
                BlueprintName = "ProductivityFWTests"
-               ReferencedContainer = "container:ProductivityFW.xcodeproj">
+               ReferencedContainer = "container:ProductivityFW/ProductivityFW.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES"
+            testExecutionOrdering = "random">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5152F6FF28F73308001383AF"
+               BuildableName = "ProductivityAppTests.xctest"
+               BlueprintName = "ProductivityAppTests"
+               ReferencedContainer = "container:ProductivityApp/ProductivityApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -66,7 +78,7 @@
             BlueprintIdentifier = "51F4D60328D16772007D92EC"
             BuildableName = "ProductivityFW.framework"
             BlueprintName = "ProductivityFW"
-            ReferencedContainer = "container:ProductivityFW.xcodeproj">
+            ReferencedContainer = "container:ProductivityFW/ProductivityFW.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
