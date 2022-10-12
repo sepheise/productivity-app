@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'ci/**'
 jobs:
   test:
     runs-on: macos-12
